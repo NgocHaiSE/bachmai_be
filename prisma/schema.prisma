@@ -1,0 +1,819 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model BENHNHAN {
+  idBenhNhan           String                 @id(map: "PK__BENHNHAN__516E1F69AB9378DD") @db.Char(10)
+  HoTen                String?                @db.NVarChar(100)
+  NgaySinh             DateTime?              @db.Date
+  GioiTinh             String?                @db.NVarChar(10)
+  NgheNghiep           String?                @db.NVarChar(50)
+  DanToc               String?                @db.NVarChar(50)
+  SDT                  String?                @db.VarChar(15)
+  DiaChi               String?                @db.NVarChar(200)
+  CCCD                 String?                @db.VarChar(20)
+  BHYT                 String?                @db.VarChar(20)
+  ThoiHanBHYT          DateTime?              @db.Date
+  DoiTuongUuTien       String?                @db.NVarChar(50)
+  HoTenThanNhan        String?                @db.NVarChar(100)
+  MoiQuanHe            String?                @db.NVarChar(20)
+  SDTThanNhan          String?                @db.VarChar(15)
+  BenhManTinh          String?                @db.NVarChar(200)
+  DiUng                String?                @db.NVarChar(200)
+  PhauThuatDaLam       String?                @db.NVarChar(200)
+  TrangThai            String?                @db.NVarChar(50)
+  idLoaiBHYT           String?                @db.Char(10)
+  LOAI_BHYT            LOAI_BHYT?             @relation(fields: [idLoaiBHYT], references: [idLoaiBHYT], onDelete: NoAction, onUpdate: NoAction, map: "FK_BENHNHAN_LOAI_BHYT")
+  GIUONG               GIUONG[]
+  HOADON_TAMUNGVIENPHI HOADON_TAMUNGVIENPHI[]
+  HOSOBENHAN           HOSOBENHAN[]
+  PDK_KHAMBENH         PDK_KHAMBENH[]
+  PYC_CHUYENVIEN       PYC_CHUYENVIEN[]
+}
+
+model CALAMVIEC {
+  idCaLamViec                                         String                @id(map: "PK_CALAMVIEC1") @db.Char(10)
+  NgayLamViec                                         DateTime?             @db.Date
+  LoaiCa                                              String?               @db.NVarChar(50)
+  GioBD                                               DateTime?             @db.Time
+  GioKT                                               DateTime?             @db.Time
+  TrangThai                                           String?               @db.NVarChar(50)
+  ThoiGianPheDuyet                                    DateTime?             @db.DateTime
+  LoaiCongViec                                        String?               @db.NVarChar(50)
+  GhiChu                                              String?               @db.NVarChar(200)
+  idNhanVien                                          String?               @db.Char(10)
+  idNguoiDung                                         String?               @db.Char(10)
+  idKhoa                                              String?               @db.Char(10)
+  idLichTongThe                                       String?               @db.Char(10)
+  idNguoiPheDuyet                                     String?               @db.Char(10)
+  CALAMVIEC                                           CALAMVIEC             @relation("CALAMVIECToCALAMVIEC", fields: [idCaLamViec], references: [idCaLamViec], onUpdate: NoAction, map: "FK_CALAMVIEC_CALAMVIEC")
+  other_CALAMVIEC                                     CALAMVIEC?            @relation("CALAMVIECToCALAMVIEC")
+  KHOA                                                KHOA?                 @relation(fields: [idKhoa], references: [idKhoa], onDelete: NoAction, onUpdate: NoAction, map: "FK_CALAMVIEC_KHOA")
+  LICH_TONGTHE                                        LICH_TONGTHE?         @relation(fields: [idLichTongThe], references: [idLichTongThe], onDelete: NoAction, onUpdate: NoAction, map: "FK_CALAMVIEC_LICH_TONGTHE")
+  NGHIPHEP_ANHHUONGCA                                 NGHIPHEP_ANHHUONGCA[]
+  PYC_CHUYENCA_PYC_CHUYENCA_idCaLamViecGocToCALAMVIEC PYC_CHUYENCA[]        @relation("PYC_CHUYENCA_idCaLamViecGocToCALAMVIEC")
+  PYC_CHUYENCA_PYC_CHUYENCA_idCaLamViecMoiToCALAMVIEC PYC_CHUYENCA[]        @relation("PYC_CHUYENCA_idCaLamViecMoiToCALAMVIEC")
+  PYC_CHUYENCA_PYC_CHUYENCA_idCaLamViecBuToCALAMVIEC  PYC_CHUYENCA[]        @relation("PYC_CHUYENCA_idCaLamViecBuToCALAMVIEC")
+}
+
+model CANLAMSANG {
+  idCanLamSang       String             @id(map: "PK__PHAUTHUA__C15628A51B15D09E") @db.Char(10)
+  TenCLS             String?            @db.NVarChar(100)
+  TenLoaiCLS         String?            @db.NVarChar(100)
+  ChiPhi             Decimal?           @db.Decimal(18, 2)
+  DVT                String?            @db.NVarChar(20)
+  KhoangThamChieuNam String?            @db.NVarChar(100)
+  KhoangThamChieuNu  String?            @db.NVarChar(100)
+  ThuTuHienThi       Int?
+  idCanLamSangCha    String?            @db.Char(10)
+  idKhoa             String?            @db.Char(10)
+  CANLAMSANG         CANLAMSANG?        @relation("CANLAMSANGToCANLAMSANG", fields: [idCanLamSangCha], references: [idCanLamSang], onDelete: NoAction, onUpdate: NoAction, map: "FK_CANLAMSANG_CANLAMSANG")
+  other_CANLAMSANG   CANLAMSANG[]       @relation("CANLAMSANGToCANLAMSANG")
+  CT_HOADONVIENPHI   CT_HOADONVIENPHI[]
+  P_XETNGHIEM        P_XETNGHIEM[]
+}
+
+model CAPPHAT_THIETBI {
+  idCapPhat   String    @id(map: "PK_THIETBIBIENCHE") @db.Char(10)
+  NgayCapPhat DateTime? @db.Date
+  NguoiNhan   String?   @db.NVarChar(50)
+  NguoiLap    String?   @db.NVarChar(50)
+  SoLuong     Int?
+  TinhTrang   String?   @db.NVarChar(50)
+  NguonCung   String?   @db.NVarChar(50)
+  GhiChu      String?   @db.NVarChar(50)
+  idThietBi   String?   @db.Char(10)
+  idKhoa      String?   @db.Char(10)
+  KHOA        KHOA?     @relation(fields: [idKhoa], references: [idKhoa], onDelete: NoAction, onUpdate: NoAction, map: "FK_CAPPHAT_THIETBI_KHOA")
+  THIETBI     THIETBI?  @relation(fields: [idThietBi], references: [idThietBi], onDelete: NoAction, onUpdate: NoAction, map: "FK_CAPPHAT_THIETBI_THIETBI")
+}
+
+model CHAMCONG {
+  idChamCong   String    @id(map: "PK_ChamCong") @db.Char(10)
+  NgayCong     Int?
+  NgayNghi     Int?
+  CoPhep       Int?
+  LyDoNghi     String?   @db.NVarChar(50)
+  NgayChamCong DateTime? @db.Date
+  idKhoa       String?   @db.Char(10)
+  idNguoiDung  String?   @db.Char(10)
+  idNhanVien   String?   @db.Char(10)
+  KHOA         KHOA?     @relation(fields: [idKhoa], references: [idKhoa], onDelete: NoAction, onUpdate: NoAction, map: "FK_CHAMCONG_KHOA")
+  NHANVIEN     NHANVIEN? @relation(fields: [idNhanVien], references: [idNhanVien], onDelete: NoAction, onUpdate: NoAction, map: "FK_CHAMCONG_NHANVIEN")
+}
+
+model CT_DONTHUOC {
+  idDonThuoc String    @db.Char(10)
+  idDuocPham String    @db.Char(10)
+  LieuDung   String?   @db.NVarChar(50)
+  DuongDung  String?   @db.NVarChar(20)
+  SoLuong    Int?
+  GhiChu     String?   @db.NVarChar(50)
+  DON_THUOC  DON_THUOC @relation(fields: [idDonThuoc], references: [idDonThuoc], onUpdate: NoAction, map: "FK_CT_DONTHUOC_DONTHUOC")
+  DUOCPHAM   DUOCPHAM  @relation(fields: [idDuocPham], references: [idDuocPham], onUpdate: NoAction, map: "FK_CT_DONTHUOC_DUOCPHAM")
+
+  @@id([idDonThuoc, idDuocPham], map: "PK_CT_DONTHUOC")
+}
+
+model CT_GOI_VACXIN {
+  idGoiVX    String     @db.Char(10)
+  idVacXin   String     @db.Char(10)
+  GOI_VACXIN GOI_VACXIN @relation(fields: [idGoiVX], references: [idGoiVX], onUpdate: NoAction, map: "FK_CT_GOI_VACXIN_GOI_VACXIN")
+  VACXIN     VACXIN     @relation(fields: [idVacXin], references: [idVacXin], onUpdate: NoAction, map: "FK_CT_GOI_VACXIN_VACXIN")
+
+  @@id([idGoiVX, idVacXin], map: "PK_Table_2_1")
+}
+
+model CT_HOADONTIEMCHUNG {
+  idHoaDonTiemChung String           @db.Char(10)
+  idVacxin          String           @db.Char(10)
+  SoLuong           Int?
+  GhiChu            String?          @db.NVarChar(50)
+  HOADON_TIEMCHUNG  HOADON_TIEMCHUNG @relation(fields: [idHoaDonTiemChung], references: [idHoaDonTiemChung], onUpdate: NoAction, map: "FK_CT_HOADONTIEMCHUNG_HOADON_TIEMCHUNG")
+  VACXIN            VACXIN           @relation(fields: [idVacxin], references: [idVacXin], onUpdate: NoAction, map: "FK_CT_HOADONTIEMCHUNG_VACXIN")
+
+  @@id([idHoaDonTiemChung, idVacxin], map: "PK_CT_HOADONTIEMCHUNG_1")
+}
+
+model CT_HOADONVIENPHI {
+  idCTVienPhi  String      @id(map: "PK_CT_HOADONVIENPHI") @db.Char(10)
+  idVienPhi    String?     @db.Char(10)
+  idCanLamSang String?     @db.Char(10)
+  idNoiTru     String?     @db.Char(10)
+  CANLAMSANG   CANLAMSANG? @relation(fields: [idCanLamSang], references: [idCanLamSang], onDelete: NoAction, onUpdate: NoAction, map: "FK_CT_HOADONVIENPHI_CANLAMSANG")
+  NOITRU       NOITRU?     @relation(fields: [idNoiTru], references: [idNoiTru], onDelete: NoAction, onUpdate: NoAction, map: "FK_CT_HOADONVIENPHI_NOITRU")
+}
+
+model CT_KHTHUCHI {
+  idCT              String             @id(map: "PK_Table_2") @db.Char(10)
+  idKeHoachTaiChinh String?            @db.Char(10)
+  NoiDung           String?            @db.NVarChar(50)
+  SoTienThu         Decimal?           @db.Decimal(18, 0)
+  SoTienChi         Decimal?           @db.Decimal(18, 0)
+  KH_THUCHITAICHINH KH_THUCHITAICHINH? @relation(fields: [idKeHoachTaiChinh], references: [idKeHoachTaiChinh], onDelete: NoAction, onUpdate: NoAction, map: "FK_CT_KHTHUCHI_KH_THUCHITAICHINH")
+}
+
+model CT_NHAPKHODUOCPHAM {
+  idNhapKhoDuocPham String       @db.Char(10)
+  idDuocPham        String       @db.Char(10)
+  HanSuDung         DateTime?    @db.Date
+  NhaSX             String?      @db.NVarChar(50)
+  SoLuong           Int?
+  DonGiaMua         Decimal?     @db.Decimal(18, 2)
+  GhiChu            String?      @db.NVarChar(50)
+  PNK_DUOCPHAM      PNK_DUOCPHAM @relation(fields: [idNhapKhoDuocPham], references: [idNhapKhoDuocPham], onUpdate: NoAction, map: "FK_CT_NHAPKHODUOCPHAM_PNK_DUOCPHAM")
+
+  @@id([idNhapKhoDuocPham, idDuocPham], map: "PK__CT_NHAPK__918DB222FD10A579")
+}
+
+model CT_YEUCAUDUOCPHAM {
+  idChiTietYeuCau  String         @id(map: "PK_CT_YEUCAUDUOCPHAM_1") @db.Char(10)
+  TenDuocPham      String?        @db.NVarChar(50)
+  LieuDung         String?        @db.NVarChar(50)
+  GhiChu           String?        @db.NVarChar(50)
+  SoLuong          Int?
+  LaThuocMoi       Boolean?
+  idYeuCauDuocPham String?        @db.Char(10)
+  idDuocPham       String?        @db.Char(10)
+  idLoaiDuocPham   String?        @db.Char(10)
+  DUOCPHAM         DUOCPHAM?      @relation(fields: [idDuocPham], references: [idDuocPham], onDelete: NoAction, onUpdate: NoAction, map: "FK_CT_YEUCAUDUOCPHAM_DUOCPHAM")
+  LOAI_DUOCPHAM    LOAI_DUOCPHAM? @relation(fields: [idLoaiDuocPham], references: [idLoaiDuocPham], onDelete: NoAction, onUpdate: NoAction, map: "FK_CT_YEUCAUDUOCPHAM_LOAI_DUOCPHAM")
+  PYC_DUOCPHAM     PYC_DUOCPHAM?  @relation(fields: [idYeuCauDuocPham], references: [idYeuCauDuocPham], onDelete: NoAction, onUpdate: NoAction, map: "FK_CT_YEUCAUDUOCPHAM_PYC_DUOCPHAM")
+}
+
+model DEXUAT {
+  idDX        String    @id(map: "PK_DeXuat") @db.Char(10)
+  NgayDeXuat  DateTime? @db.DateTime
+  TenKhoa     String?   @db.NVarChar(100)
+  File        String?   @db.VarChar(50)
+  GhiChu      String?   @db.NVarChar(50)
+  TrangThai   String?   @db.NVarChar(50)
+  idKhoa      String?   @db.Char(10)
+  idNguoiDung String?   @db.Char(10)
+  KHOA        KHOA?     @relation(fields: [idKhoa], references: [idKhoa], onDelete: NoAction, onUpdate: NoAction, map: "FK_DEXUAT_KHOA")
+}
+
+model DICHVU {
+  idDichVu String   @id(map: "PK_DichVuKhamBenh") @db.Char(10)
+  TenDV    String?  @db.NVarChar(100)
+  ChiPhi   Decimal? @db.Decimal(18, 0)
+  Anh      String?  @db.NVarChar(255)
+  DVT      String?  @db.NVarChar(50)
+  MoTa     String?  @db.NVarChar(200)
+  idLoaiDV String?  @db.Char(10)
+  idKhoa   String?  @db.Char(10)
+  KHOA     KHOA?    @relation(fields: [idKhoa], references: [idKhoa], onDelete: NoAction, onUpdate: NoAction, map: "FK_DICHVU_KHOA")
+  LOAI_DV  LOAI_DV? @relation(fields: [idKhoa], references: [idLoaiDV], onDelete: NoAction, onUpdate: NoAction, map: "FK_DICHVU_LOAI_DV")
+}
+
+model DON_NGHIPHEP {
+  idNghiPhep                                        String                @id(map: "PK_DON_XINNGHI") @db.Char(10)
+  LoaiPhep                                          String?               @db.NVarChar(50)
+  NgayBD                                            DateTime?             @db.Date
+  NgayKT                                            DateTime?             @db.Date
+  GioBD                                             DateTime?             @db.Time
+  GioKT                                             DateTime?             @db.Time
+  NghiCaNgay                                        Boolean?
+  TongNgayNghi                                      Float?
+  LyDo                                              String?               @db.NVarChar(200)
+  TrangThai                                         String?               @db.NVarChar(50)
+  NgayLap                                           DateTime?             @db.Date
+  NgayPheDuyet                                      DateTime?             @db.DateTime
+  GhiChuPheDuyet                                    String?               @db.NVarChar(200)
+  HoTenNguoiLienHe                                  String?               @db.NVarChar(100)
+  SDTNguoiLienHe                                    String?               @db.VarChar(50)
+  MoiQuanHe                                         String?               @db.NVarChar(50)
+  GhiChu                                            String?               @db.NVarChar(200)
+  idNhanVien                                        String?               @db.Char(10)
+  idNguoiDung                                       String?               @db.Char(10)
+  idNguoiPheDuyet                                   String?               @db.Char(10)
+  idNhanVienThayThe                                 String?               @db.Char(10)
+  NHANVIEN_DON_NGHIPHEP_idNhanVienThayTheToNHANVIEN NHANVIEN?             @relation("DON_NGHIPHEP_idNhanVienThayTheToNHANVIEN", fields: [idNhanVienThayThe], references: [idNhanVien], onDelete: NoAction, onUpdate: NoAction, map: "FK_DON_NGHIPHEP_NHANVIEN2")
+  NHANVIEN_DON_NGHIPHEP_idNhanVienToNHANVIEN        NHANVIEN?             @relation("DON_NGHIPHEP_idNhanVienToNHANVIEN", fields: [idNhanVien], references: [idNhanVien], onDelete: NoAction, onUpdate: NoAction, map: "FK_DON_NGHIPHEP_NHANVIEN3")
+  NGHIPHEP_ANHHUONGCA                               NGHIPHEP_ANHHUONGCA[]
+}
+
+model DON_THUOC {
+  idDonThuoc  String        @id(map: "PK_DONTHUOC") @db.Char(10)
+  NgayLap     DateTime?     @db.Date
+  TrangThai   String?       @db.NVarChar(50)
+  GhiChu      String?       @db.NVarChar(200)
+  idNguoiDung String?       @db.Char(10)
+  idKhamBenh  String?       @db.Char(10)
+  CT_DONTHUOC CT_DONTHUOC[]
+}
+
+model DUOCPHAM {
+  idDuocPham        String              @id(map: "PK_DuocPham") @db.Char(10)
+  TenDuocPham       String?             @db.NVarChar(50)
+  DVT               String?             @db.NVarChar(50)
+  HanSuDung         DateTime?           @db.Date
+  NhaSX             String?             @db.NVarChar(50)
+  SoLuong           Int?
+  DonGiaMua         Decimal?            @db.Decimal(18, 0)
+  DonGiaBan         Decimal?            @db.Decimal(18, 0)
+  MoTa              String?             @db.NVarChar(200)
+  DonVi             String?             @db.NVarChar(50)
+  HoatChat          String?             @db.NVarChar(200)
+  idLoaiDuocPham    String?             @db.Char(10)
+  idNCC             String?             @db.Char(10)
+  CT_DONTHUOC       CT_DONTHUOC[]
+  CT_YEUCAUDUOCPHAM CT_YEUCAUDUOCPHAM[]
+  LOAI_DUOCPHAM     LOAI_DUOCPHAM?      @relation(fields: [idLoaiDuocPham], references: [idLoaiDuocPham], onDelete: NoAction, onUpdate: NoAction, map: "FK_DUOCPHAM_LOAI_DUOCPHAM")
+  NCC               NCC?                @relation(fields: [idNCC], references: [idNCC], onDelete: NoAction, onUpdate: NoAction, map: "FK_DUOCPHAM_NCC")
+}
+
+model GIUONG {
+  idGiuong   String    @id(map: "PK__GIUONG__2F4CE982EED6EBF8") @db.Char(10)
+  TrangThai  String?   @db.NVarChar(50)
+  Kho        Boolean?
+  GhiChu     String?   @db.NVarChar(50)
+  idKhoa     String?   @db.Char(10)
+  idBenhNhan String?   @db.Char(10)
+  BENHNHAN   BENHNHAN? @relation(fields: [idBenhNhan], references: [idBenhNhan], onDelete: NoAction, onUpdate: NoAction, map: "FK_GIUONG_BENHNHAN")
+}
+
+model GOI_VACXIN {
+  idGoiVX       String          @id(map: "PK_GOI_VACXIN") @db.Char(10)
+  TenGoi        String?         @db.NVarChar(100)
+  CT_GOI_VACXIN CT_GOI_VACXIN[]
+}
+
+model HOADON_DIENNUOC {
+  idDienNuoc  String    @id(map: "PK_HoaDon_DienNuoc") @db.Char(10)
+  NgayLap     DateTime? @db.DateTime
+  TuNgay      DateTime? @db.DateTime
+  DenNgay     DateTime? @db.DateTime
+  NhaCungCap  String?   @db.NVarChar(50)
+  DonGia      Decimal?  @db.Decimal(18, 0)
+  SanLuong    Int?
+  TrangThai   String?   @db.NVarChar(50)
+  GhiChu      String?   @db.NVarChar(50)
+  idKhoa      String?   @db.Char(10)
+  idNguoiDung String?   @db.Char(10)
+  KHOA        KHOA?     @relation(fields: [idKhoa], references: [idKhoa], onDelete: NoAction, onUpdate: NoAction, map: "FK_HOADON_DIENNUOC_KHOA")
+}
+
+model HOADON_TAMUNGVIENPHI {
+  idTamUngVienPhi   String    @id(map: "PK_HOADON_TAMUNGVIENPHI") @db.Char(10)
+  NgayLap           DateTime? @db.Date
+  HinhThucThanhToan String?   @db.NVarChar(50)
+  SoTienTamUng      Decimal?  @db.Decimal(18, 0)
+  TrangThai         String?   @db.NVarChar(50)
+  GhiChu            String?   @db.NVarChar(50)
+  idBenhNhan        String?   @db.Char(10)
+  idNguoiDung       String?   @db.Char(10)
+  BENHNHAN          BENHNHAN? @relation(fields: [idBenhNhan], references: [idBenhNhan], onDelete: NoAction, onUpdate: NoAction, map: "FK_HOADON_TAMUNGVIENPHI_BENHNHAN")
+}
+
+model HOADON_TIEMCHUNG {
+  idHoaDonTiemChung  String               @id(map: "PK_HOADON_TIEMCHUNG") @db.Char(10)
+  NgayLap            DateTime?            @db.Date
+  HinhThucThanhToan  String?              @db.NVarChar(50)
+  TrangThai          String?              @db.NVarChar(50)
+  idDKTiemChung      String?              @db.Char(10)
+  idBenhNhan         String?              @db.Char(10)
+  idNguoiDung        String?              @db.Char(10)
+  CT_HOADONTIEMCHUNG CT_HOADONTIEMCHUNG[]
+}
+
+model HOADON_VIENPHI {
+  idVienPhi         String      @id(map: "PK_HOADON_VIENPHI_1") @db.Char(10)
+  NgayLap           DateTime?   @db.Date
+  HinhThucThanhToan String?     @db.NVarChar(50)
+  GhiChu            String?     @db.NVarChar(50)
+  TrangThai         String?     @db.NVarChar(50)
+  idKhamBenh        String?     @db.Char(10)
+  idTamUngVienPhi   String?     @db.Char(10)
+  idNguoiDung       String?     @db.Char(10)
+  P_KHAMBENH        P_KHAMBENH? @relation(fields: [idKhamBenh], references: [idKhamBenh], onDelete: NoAction, onUpdate: NoAction, map: "FK_HOADON_VIENPHI_P_KHAMBENH")
+}
+
+model HOSOBENHAN {
+  idHoSo       String    @id(map: "PK_HOSOBENHAN") @db.Char(10)
+  NgayLap      DateTime? @db.Date
+  NoiChuyenDen String?   @db.NVarChar(255)
+  GhiChu       String?   @db.NVarChar(Max)
+  idNguoiDung  String?   @db.Char(10)
+  idBenhNhan   String    @db.Char(10)
+  BENHNHAN     BENHNHAN  @relation(fields: [idBenhNhan], references: [idBenhNhan], onUpdate: NoAction, map: "FK_HOSOBENHAN_BENHNHAN")
+}
+
+model ICD {
+  idICD                                    String       @id(map: "PK_ICD") @db.Char(10)
+  TenBenh                                  String?      @db.NVarChar(100)
+  GhiChu                                   String?      @db.NVarChar(50)
+  P_KHAMBENH_P_KHAMBENH_idICDChanDoanToICD P_KHAMBENH[] @relation("P_KHAMBENH_idICDChanDoanToICD")
+  P_KHAMBENH_P_KHAMBENH_idICDKetLuanToICD  P_KHAMBENH[] @relation("P_KHAMBENH_idICDKetLuanToICD")
+}
+
+model KH_THUCHITAICHINH {
+  idKeHoachTaiChinh String        @id(map: "PK_KH_ThuChiTaiChinh") @db.Char(10)
+  NgayLap           DateTime?     @db.DateTime
+  PheDuyet          Boolean?
+  NgayPheDuyet      DateTime?     @db.DateTime
+  NamKeHoach        Int?
+  idKhoa            String?       @db.Char(10)
+  idNguoiDung       String?       @db.Char(10)
+  CT_KHTHUCHI       CT_KHTHUCHI[]
+  KHOA              KHOA?         @relation(fields: [idKhoa], references: [idKhoa], onDelete: NoAction, onUpdate: NoAction, map: "FK_KH_THUCHITAICHINH_KHOA")
+}
+
+model KHOA {
+  idKhoa            String              @id(map: "PK__KHOA__C30A683D16699904") @db.Char(10)
+  TenKhoa           String?             @db.NVarChar(100)
+  ViTri             String?             @db.NVarChar(200)
+  MucTieu           String?             @db.NVarChar(200)
+  NgayThanhLap      DateTime?           @db.Date
+  NgayHD            DateTime?           @db.Date
+  TrangThai         String?             @db.NVarChar(50)
+  TruongKhoa        String?             @db.NVarChar(50)
+  idLoaiKhoa        String?             @db.Char(10)
+  CALAMVIEC         CALAMVIEC[]
+  CAPPHAT_THIETBI   CAPPHAT_THIETBI[]
+  CHAMCONG          CHAMCONG[]
+  DEXUAT            DEXUAT[]
+  DICHVU            DICHVU[]
+  HOADON_DIENNUOC   HOADON_DIENNUOC[]
+  KH_THUCHITAICHINH KH_THUCHITAICHINH[]
+  LOAIKHOA          LOAIKHOA?           @relation(fields: [idLoaiKhoa], references: [idLoaiKhoa], onDelete: NoAction, onUpdate: NoAction, map: "FK_KHOA_LOAIKHOA")
+  LOAI_DV           LOAI_DV[]
+  MAU_LICHLAMVIEC   MAU_LICHLAMVIEC[]
+  PDK_KHAMBENH      PDK_KHAMBENH[]
+  PYC_CAPGIUONG     PYC_CAPGIUONG[]
+  QUYETDINH         QUYETDINH[]
+  VATTU             VATTU[]
+}
+
+model LICH_TONGTHE {
+  idLichTongThe String      @id(map: "PK_LICH_TONGTHE") @db.Char(10)
+  TenLich       String?     @db.NVarChar(100)
+  TuNgay        DateTime?   @db.Date
+  DenNgay       DateTime?   @db.Date
+  TrangThai     String?     @db.NVarChar(50)
+  CALAMVIEC     CALAMVIEC[]
+}
+
+model LICHSUTRUYCAP {
+  idLichSu      String          @id(map: "PK_LichSuTruyCap") @db.Char(10)
+  ThoiDiemDN    DateTime        @db.DateTime
+  ThoiDiemDX    DateTime        @db.DateTime
+  idNguoiDung   String          @db.Char(10)
+  NGUOIDUNG     NGUOIDUNG       @relation(fields: [idNguoiDung], references: [idNguoiDung], onUpdate: NoAction, map: "FK_LICHSUTRUYCAP_NGUOIDUNG")
+  NHATKYTHAYDOI NHATKYTHAYDOI[]
+}
+
+model LOAI_BHYT {
+  idLoaiBHYT  String     @id(map: "PK__LOAI_BHY__3E37F9DF3EE4A752") @db.Char(10)
+  TenLoaiBHYT String?    @db.NVarChar(50)
+  MucHuong    Decimal?   @db.Decimal(5, 2)
+  GhiChu      String?    @db.NVarChar(50)
+  BENHNHAN    BENHNHAN[]
+}
+
+model LOAI_DUOCPHAM {
+  idLoaiDuocPham    String              @id(map: "PK__LOAIDUOC__6334B80B5AF2358F") @db.Char(10)
+  TenLoaiDuocPham   String?             @db.NVarChar(100)
+  GhiChu            String?             @db.NVarChar(200)
+  CT_YEUCAUDUOCPHAM CT_YEUCAUDUOCPHAM[]
+  DUOCPHAM          DUOCPHAM[]
+}
+
+model LOAI_DV {
+  idLoaiDV  String   @id(map: "PK_Loai_DVKhamBenh") @db.Char(10)
+  TenLoaiDV String?  @db.NVarChar(100)
+  MoTa      String?  @db.NVarChar(200)
+  idKhoa    String?  @db.Char(10)
+  DICHVU    DICHVU[]
+  KHOA      KHOA?    @relation(fields: [idKhoa], references: [idKhoa], onDelete: NoAction, onUpdate: NoAction, map: "FK_LOAI_DVKHAMBENH_KHOA")
+}
+
+model LOAI_VACXIN {
+  idLoaiVX String   @id(map: "PK_LOAI_VACXIN") @db.Char(10)
+  TenLoai  String?  @db.NVarChar(100)
+  MoTa     String?  @db.NVarChar(200)
+  VACXIN   VACXIN[]
+}
+
+model LOAIKHAM {
+  idLoaiKham  String       @id(map: "PK_LoaiKham") @db.Char(10)
+  TenLoaiKham String?      @db.NVarChar(100)
+  ChiPhi      Decimal?     @db.Decimal(18, 0)
+  P_KHAMBENH  P_KHAMBENH[]
+}
+
+model LOAIKHOA {
+  idLoaiKhoa  String  @id(map: "PK__LOAIKHOA__CF77FDF033676186") @db.Char(10)
+  TenLoaiKhoa String? @db.NVarChar(100)
+  MoTa        String? @db.NVarChar(200)
+  KHOA        KHOA[]
+}
+
+model MAU_LICHLAMVIEC {
+  idMauLich      String       @id(map: "PK_MAU_LICHLAMVIEC") @db.Char(10)
+  TenMauLich     String?      @db.NVarChar(100)
+  MoTa           String?      @db.NVarChar(200)
+  TrangThai      Boolean?
+  HieuLucTuNgay  DateTime?    @db.DateTime
+  HieuLucDenNgay DateTime?    @db.DateTime
+  NgayLap        DateTime?    @db.Date
+  idKhoa         String?      @db.Char(10)
+  idNguoiDung    String?      @db.Char(10)
+  KHOA           KHOA?        @relation(fields: [idKhoa], references: [idKhoa], onDelete: NoAction, onUpdate: NoAction, map: "FK_MAU_LICHLAMVIEC_KHOA1")
+  MAUCT_LICH     MAUCT_LICH[]
+}
+
+model MAUCT_LICH {
+  idMauLichCT     String           @id(map: "PK_MAUCT_LICH") @db.Char(10)
+  ThuTrongTuan    String?          @db.NVarChar(50)
+  LoaiCa          String?          @db.NVarChar(50)
+  GioBD           DateTime?        @db.Time
+  GioKT           DateTime?        @db.Time
+  SoLuongNhanVien Int?
+  VaiTroYeuCau    String?          @db.NVarChar(500)
+  idMauLich       String?          @db.Char(10)
+  MAU_LICHLAMVIEC MAU_LICHLAMVIEC? @relation(fields: [idMauLich], references: [idMauLich], onDelete: NoAction, onUpdate: NoAction, map: "FK_MAUCT_LICH_MAU_LICHLAMVIEC")
+}
+
+model NCC {
+  idNCC    String     @id(map: "PK_NCC") @db.Char(10)
+  TenNCC   String?    @db.NVarChar(100)
+  DiaChi   String?    @db.NVarChar(100)
+  SDT      String?    @db.NChar(15)
+  QuocGia  String?    @db.NVarChar(50)
+  DUOCPHAM DUOCPHAM[]
+  VACXIN   VACXIN[]
+}
+
+model NGHIPHEP_ANHHUONGCA {
+  idNghiPhep   String       @db.Char(10)
+  idCaLamViec  String       @db.Char(10)
+  CALAMVIEC    CALAMVIEC    @relation(fields: [idCaLamViec], references: [idCaLamViec], onUpdate: NoAction, map: "FK_NGHIPHEP_ANHHUONGCA_CALAMVIEC")
+  DON_NGHIPHEP DON_NGHIPHEP @relation(fields: [idNghiPhep], references: [idNghiPhep], onUpdate: NoAction, map: "FK_NGHIPHEP_ANHHUONGCA_DON_NGHIPHEP")
+
+  @@id([idNghiPhep, idCaLamViec], map: "PK_NGHIPHEP_ANHHUONGCA")
+}
+
+model NGUOIDUNG {
+  idNguoiDung    String          @id(map: "PK_NguoiDung") @db.Char(10)
+  HoTen          String?         @db.NVarChar(50)
+  SDT            Int?
+  TenDN          String?         @db.VarChar(50)
+  MatKhau        String?         @db.VarChar(50)
+  ChucVu         String?         @db.NVarChar(50)
+  idNhom         String?         @db.Char(10)
+  GioiTinh       Boolean?
+  NgaySinh       DateTime?       @db.Date
+  Email          String?         @db.NVarChar(100)
+  HeSoLuong      Decimal?        @db.Decimal(5, 2)
+  LICHSUTRUYCAP  LICHSUTRUYCAP[]
+  NHOM_NGUOIDUNG NHOM_NGUOIDUNG? @relation(fields: [idNhom], references: [idNhom], onDelete: NoAction, onUpdate: NoAction, map: "FK_NGUOIDUNG_NHOM_NGUOIDUNG")
+}
+
+model NHANVIEN {
+  idNhanVien                                            String         @id(map: "PK_NHANVIEN") @db.Char(10)
+  HoTen                                                 String?        @db.NVarChar(100)
+  GioiTinh                                              String?        @db.NVarChar(20)
+  NgaySinh                                              DateTime?      @db.Date
+  TrinhDo                                               String?        @db.NVarChar(50)
+  SDT                                                   Int?
+  Email                                                 String?        @db.NVarChar(100)
+  HeSoLuong                                             Float?
+  ChucVu                                                String?        @db.NVarChar(50)
+  idKhoa                                                String?        @db.Char(10)
+  CHAMCONG                                              CHAMCONG[]
+  DON_NGHIPHEP_DON_NGHIPHEP_idNhanVienThayTheToNHANVIEN DON_NGHIPHEP[] @relation("DON_NGHIPHEP_idNhanVienThayTheToNHANVIEN")
+  DON_NGHIPHEP_DON_NGHIPHEP_idNhanVienToNHANVIEN        DON_NGHIPHEP[] @relation("DON_NGHIPHEP_idNhanVienToNHANVIEN")
+  NHANVIEN                                              NHANVIEN       @relation("NHANVIENToNHANVIEN", fields: [idNhanVien], references: [idNhanVien], onUpdate: NoAction, map: "FK_NHANVIEN_NHANVIEN")
+  other_NHANVIEN                                        NHANVIEN?      @relation("NHANVIENToNHANVIEN")
+  PYC_CHUYENCA_PYC_CHUYENCA_idNhanVienCuToNHANVIEN      PYC_CHUYENCA[] @relation("PYC_CHUYENCA_idNhanVienCuToNHANVIEN")
+  PYC_CHUYENCA_PYC_CHUYENCA_idNhanVienMoiToNHANVIEN     PYC_CHUYENCA[] @relation("PYC_CHUYENCA_idNhanVienMoiToNHANVIEN")
+}
+
+model NHATKYTHAYDOI {
+  idNhatKy      String         @id(map: "PK_NhatKyThayDoi") @db.Char(10)
+  ThoiDiem      DateTime?      @db.DateTime
+  NoiDung       String?        @db.NVarChar(Max)
+  ThongTinCu    String?        @db.NVarChar(Max)
+  ThongTinMoi   String?        @db.NVarChar(Max)
+  idLichSu      String?        @db.Char(10)
+  LICHSUTRUYCAP LICHSUTRUYCAP? @relation(fields: [idLichSu], references: [idLichSu], onDelete: NoAction, onUpdate: NoAction, map: "FK_NHATKYTHAYDOI_LICHSUTRUYCAP")
+}
+
+model NHOM_NGUOIDUNG {
+  idNhom    String      @id(map: "PK_Nhom_NguoiDung") @db.Char(10)
+  TenNhom   String      @db.NVarChar(50)
+  idQuyen   String?     @db.Char(10)
+  NGUOIDUNG NGUOIDUNG[]
+  QUYEN     QUYEN?      @relation(fields: [idQuyen], references: [idQuyen], onDelete: NoAction, onUpdate: NoAction, map: "FK_NHOM_NGUOIDUNG_QUYEN")
+}
+
+model NOITRU {
+  idNoiTru         String             @id(map: "PK_NOITRU") @db.Char(10)
+  NgayNhapVien     DateTime?          @db.Date
+  NgayRaVien       DateTime?          @db.Date
+  DonGiaNgay       Decimal?           @db.Decimal(18, 0)
+  GhiChu           String?            @db.NVarChar(50)
+  idBenhNhan       String?            @db.Char(10)
+  CT_HOADONVIENPHI CT_HOADONVIENPHI[]
+}
+
+model P_CHUYENVIEN {
+  idChuyenVien       String          @id(map: "PK_P_CHUYENVIEN") @db.Char(10)
+  NgayLap            DateTime?       @db.Date
+  NgayChuyen         DateTime?       @db.Date
+  ThoiGianDuKien     DateTime?       @db.Time
+  SDT_CoSoYTe        String?         @db.VarChar(20)
+  YThuc              String?         @db.NVarChar(200)
+  PhuongTien         String?         @db.NVarChar(200)
+  GhiChu             String?         @db.NVarChar(200)
+  TrangThai          String?         @db.NVarChar(50)
+  NgayPheDuyet       DateTime?       @db.Date
+  idYeuCauChuyenVien String?         @db.Char(10)
+  idNguoiDiKem       String?         @db.Char(10)
+  idNguoiPheDuyet    String?         @db.Char(10)
+  idNguoiDung        String?         @db.Char(10)
+  PYC_CHUYENVIEN     PYC_CHUYENVIEN? @relation(fields: [idYeuCauChuyenVien], references: [idYeuCauChuyenVien], onDelete: NoAction, onUpdate: NoAction, map: "FK_P_CHUYENVIEN_PYC_CHUYENVIEN")
+}
+
+model P_KHAMBENH {
+  idKhamBenh                        String           @id(map: "PK_P_KHAMBENH_1") @db.Char(10)
+  NgayKham                          DateTime?        @db.DateTime
+  QuaTrinhBenhLy                    String?          @db.NVarChar(100)
+  TrieuChungDiKem                   String?          @db.NVarChar(100)
+  ToanTrang                         String?          @db.NVarChar(100)
+  ChiSoMach                         Int?
+  ChiSoNhietDo                      Int?
+  ChiSoHuyetAp                      String?          @db.NChar(10)
+  ChiSoNhipTho                      Int?
+  ChiSoSpO2                         Int?
+  TieuHoa                           String?          @db.NVarChar(100)
+  TimMach                           String?          @db.NVarChar(100)
+  HoHap                             String?          @db.NVarChar(100)
+  HuyetAp                           String?          @db.NVarChar(100)
+  ThanTietNieu                      String?          @db.NVarChar(100)
+  ThanKinh                          String?          @db.NVarChar(100)
+  Khac                              String?          @db.NVarChar(100)
+  TienLuong                         String?          @db.NVarChar(100)
+  DieuTriNgoaiTru                   Boolean?
+  NhapVien                          Boolean?
+  ChuyenKhamChuyenKhoaKhac          Boolean?
+  ChanDoanPhanBiet                  String?          @db.NVarChar(100)
+  GhiChu                            String?          @db.NVarChar(100)
+  NhanXet                           String?          @db.NVarChar(100)
+  LoiDan                            String?          @db.NVarChar(100)
+  NgayTaiKham                       DateTime?        @db.Date
+  LyDoTaiKham                       String?          @db.NVarChar(100)
+  idHoSo                            String?          @db.Char(10)
+  idDKKhamBenh                      String?          @db.Char(10)
+  idCanLamSang                      String?          @db.Char(10)
+  idVacxin                          String?          @db.Char(10)
+  idICDChanDoan                     String?          @db.Char(10)
+  idICDKetLuan                      String?          @db.Char(10)
+  idNguoiDung                       String?          @db.Char(10)
+  idLoaiKham                        String?          @db.Char(10)
+  HOADON_VIENPHI                    HOADON_VIENPHI[]
+  ICD_P_KHAMBENH_idICDChanDoanToICD ICD?             @relation("P_KHAMBENH_idICDChanDoanToICD", fields: [idICDChanDoan], references: [idICD], onDelete: NoAction, onUpdate: NoAction, map: "FK_P_KHAMBENH_ICD")
+  ICD_P_KHAMBENH_idICDKetLuanToICD  ICD?             @relation("P_KHAMBENH_idICDKetLuanToICD", fields: [idICDKetLuan], references: [idICD], onDelete: NoAction, onUpdate: NoAction, map: "FK_P_KHAMBENH_ICD1")
+  LOAIKHAM                          LOAIKHAM?        @relation(fields: [idLoaiKham], references: [idLoaiKham], onDelete: NoAction, onUpdate: NoAction, map: "FK_P_KHAMBENH_LOAIKHAM")
+  PDK_KHAMBENH                      PDK_KHAMBENH?    @relation(fields: [idDKKhamBenh], references: [idDKKhambenh], onDelete: NoAction, onUpdate: NoAction, map: "FK_P_KHAMBENH_PDK_KHAMBENH")
+  VACXIN                            VACXIN?          @relation(fields: [idVacxin], references: [idVacXin], onDelete: NoAction, onUpdate: NoAction, map: "FK_P_KHAMBENH_VACXIN")
+  P_XETNGHIEM                       P_XETNGHIEM[]
+}
+
+model P_XETNGHIEM {
+  idXetNghiem           String      @id(map: "PK_P_XETNGHIEM") @db.Char(10)
+  NgayLap               DateTime?   @db.DateTime
+  GiaTriKetQua_So       Decimal?    @db.Decimal(18, 4)
+  GiaTriKetQua_Text     String?     @db.NVarChar(100)
+  DVTKetQua             String?     @db.NVarChar(50)
+  KhoangThamChieuApDung String?     @db.NVarChar(100)
+  idNguoiDung           String?     @db.Char(10)
+  idKhamBenh            String?     @db.Char(10)
+  idCanLamSang          String?     @db.Char(10)
+  CANLAMSANG            CANLAMSANG? @relation(fields: [idCanLamSang], references: [idCanLamSang], onDelete: NoAction, onUpdate: NoAction, map: "FK_P_XETNGHIEM_CANLAMSANG")
+  P_KHAMBENH            P_KHAMBENH? @relation(fields: [idKhamBenh], references: [idKhamBenh], onDelete: NoAction, onUpdate: NoAction, map: "FK_P_XETNGHIEM_P_KHAMBENH")
+}
+
+model PDK_KHAMBENH {
+  idDKKhambenh             String       @id(map: "PK__PDK_KHAM__957E87FC9EC35477") @db.Char(10)
+  NgayLap                  DateTime?    @db.DateTime
+  LyDoKham                 String?      @db.NVarChar(200)
+  ThoiGianBatDauTrieuChung DateTime?    @db.Date
+  PhongKhamSo              String?      @db.NVarChar(10)
+  TienSuBenhLyBanThan      String?      @db.NVarChar(200)
+  TienSuBenhLyGiaDinh      String?      @db.NVarChar(200)
+  ThuocDangSuDung          String?      @db.NVarChar(200)
+  KhamBHYT                 Boolean?
+  TrangThai                String?      @db.NVarChar(50)
+  idBenhNhan               String?      @db.Char(10)
+  idKhoa                   String?      @db.Char(10)
+  idNguoiDung              String?      @db.Char(10)
+  P_KHAMBENH               P_KHAMBENH[]
+  BENHNHAN                 BENHNHAN?    @relation(fields: [idBenhNhan], references: [idBenhNhan], onDelete: NoAction, onUpdate: NoAction, map: "FK_PDK_KHAMBENH_BENHNHAN")
+  KHOA                     KHOA?        @relation(fields: [idKhoa], references: [idKhoa], onDelete: NoAction, onUpdate: NoAction, map: "FK_PDK_KHAMBENH_KHOA")
+}
+
+model PDK_TIEMCHUNG {
+  idDKTiemChung    String    @id(map: "PK_PKD_TIEMCHUNG") @db.Char(10)
+  NgayLap          DateTime? @db.Date
+  NgayTiem         DateTime? @db.Date
+  HoTenNguoiTiem   String?   @db.NVarChar(50)
+  GioiTinh         String?   @db.NVarChar(50)
+  NgaySinh         DateTime? @db.Date
+  DiaChi           String?   @db.NVarChar(50)
+  SDT              Int?
+  HoTenNguoiLienHe String?   @db.NVarChar(50)
+  QuanHe           String?   @db.NVarChar(50)
+  SDT_LienHe       String?   @db.NVarChar(20)
+  Email            String?   @db.NVarChar(50)
+  ThoiGianTiem     String?   @db.NVarChar(50)
+  LieuTiem         String?   @db.NVarChar(50)
+  GhiChu           String?   @db.NVarChar(50)
+  TrangThai        String?   @db.NVarChar(50)
+  idVacXin         String?   @db.Char(10)
+  idNguoiDung      String?   @db.Char(10)
+  idBenhNhan       String?   @db.Char(10)
+  VACXIN           VACXIN?   @relation(fields: [idVacXin], references: [idVacXin], onDelete: NoAction, onUpdate: NoAction, map: "FK_PDK_TIEMCHUNG_VACXIN")
+}
+
+model PNK_DUOCPHAM {
+  idNhapKhoDuocPham  String               @id(map: "PK__PNK_DUOC__A5B4E43332351B80") @db.Char(10)
+  NgayLap            DateTime?            @db.Date
+  NgayNhapKho        DateTime?            @db.Date
+  TrangThai          String?              @db.NVarChar(50)
+  NgayPheDuyet       DateTime?            @db.Date
+  idNguoiPheDuyet    String?              @db.Char(10)
+  idNCC              String?              @db.Char(10)
+  idNguoiDung        String?              @db.Char(10)
+  CT_NHAPKHODUOCPHAM CT_NHAPKHODUOCPHAM[]
+}
+
+model PYC_CAPGIUONG {
+  idYeuCauCapGiuong String    @id(map: "PK_PYC_CapGiuong") @db.Char(10)
+  NgayLap           DateTime? @db.DateTime
+  PheDuyet          Boolean?
+  NgayPheDuyet      DateTime? @db.DateTime
+  SoLuong           Int?
+  LyDo              String?   @db.NVarChar(200)
+  idNguoiDung       String?   @db.Char(10)
+  idKhoa            String?   @db.Char(10)
+  KHOA              KHOA?     @relation(fields: [idKhoa], references: [idKhoa], onDelete: NoAction, onUpdate: NoAction, map: "FK_PYC_CAPGIUONG_KHOA")
+}
+
+model PYC_CHUYENCA {
+  idYeuCauChuyenCa                                 String     @id(map: "PK_CHUYENCA") @db.Char(10)
+  NgayChuyen                                       DateTime?  @db.Date
+  LyDo                                             String?    @db.NVarChar(200)
+  TrangThai                                        String?    @db.NVarChar(50)
+  NgayYeuCau                                       DateTime?  @db.Date
+  NgayPheDuyet                                     DateTime?  @db.DateTime
+  GhiChuPheDuyet                                   String?    @db.NVarChar(50)
+  CanBuCa                                          Boolean?
+  GhiChu                                           String?    @db.NVarChar(50)
+  idNhanVienCu                                     String?    @db.Char(10)
+  idNhanVienMoi                                    String?    @db.Char(10)
+  idCaLamViecGoc                                   String?    @db.Char(10)
+  idCaLamViecMoi                                   String?    @db.Char(10)
+  idCaLamViecBu                                    String?    @db.Char(10)
+  idNguoiDung                                      String?    @db.Char(10)
+  idNguoiPheDuyet                                  String?    @db.Char(10)
+  CALAMVIEC_PYC_CHUYENCA_idCaLamViecGocToCALAMVIEC CALAMVIEC? @relation("PYC_CHUYENCA_idCaLamViecGocToCALAMVIEC", fields: [idCaLamViecGoc], references: [idCaLamViec], onDelete: NoAction, onUpdate: NoAction, map: "FK_PYC_CHUYENCA_CALAMVIEC")
+  CALAMVIEC_PYC_CHUYENCA_idCaLamViecMoiToCALAMVIEC CALAMVIEC? @relation("PYC_CHUYENCA_idCaLamViecMoiToCALAMVIEC", fields: [idCaLamViecMoi], references: [idCaLamViec], onDelete: NoAction, onUpdate: NoAction, map: "FK_PYC_CHUYENCA_CALAMVIEC1")
+  CALAMVIEC_PYC_CHUYENCA_idCaLamViecBuToCALAMVIEC  CALAMVIEC? @relation("PYC_CHUYENCA_idCaLamViecBuToCALAMVIEC", fields: [idCaLamViecBu], references: [idCaLamViec], onDelete: NoAction, onUpdate: NoAction, map: "FK_PYC_CHUYENCA_CALAMVIEC2")
+  NHANVIEN_PYC_CHUYENCA_idNhanVienCuToNHANVIEN     NHANVIEN?  @relation("PYC_CHUYENCA_idNhanVienCuToNHANVIEN", fields: [idNhanVienCu], references: [idNhanVien], onDelete: NoAction, onUpdate: NoAction, map: "FK_PYC_CHUYENCA_NHANVIEN")
+  NHANVIEN_PYC_CHUYENCA_idNhanVienMoiToNHANVIEN    NHANVIEN?  @relation("PYC_CHUYENCA_idNhanVienMoiToNHANVIEN", fields: [idNhanVienMoi], references: [idNhanVien], onDelete: NoAction, onUpdate: NoAction, map: "FK_PYC_CHUYENCA_NHANVIEN1")
+}
+
+model PYC_CHUYENVIEN {
+  idYeuCauChuyenVien String         @id(map: "PK__PYC_CHUY__DA60153823B5F7E4") @db.Char(10)
+  NgayLap            DateTime?      @db.Date
+  LyDo               String?        @db.NVarChar(200)
+  CoSoChuyenDen      String?        @db.NVarChar(200)
+  DiaChi             String?        @db.NVarChar(200)
+  NgayChuyen         DateTime?      @db.Date
+  TrangThai          String?        @db.NVarChar(50)
+  NgayPheDuyet       DateTime?      @db.Date
+  GhiChu             String?        @db.NVarChar(200)
+  MucDo              String?        @db.NVarChar(50)
+  YkienPheDuyet      String?        @db.NVarChar(200)
+  idBacSiPhuTrach    String?        @db.Char(10)
+  idNguoiPheDuyet    String?        @db.Char(10)
+  idBenhNhan         String?        @db.Char(10)
+  idNguoiDung        String?        @db.Char(10)
+  P_CHUYENVIEN       P_CHUYENVIEN[]
+  BENHNHAN           BENHNHAN?      @relation(fields: [idBenhNhan], references: [idBenhNhan], onDelete: NoAction, onUpdate: NoAction, map: "FK_PYC_CHUYENVIEN_BENHNHAN")
+}
+
+model PYC_DUOCPHAM {
+  idYeuCauDuocPham  String              @id(map: "PK_PYC_DUOCpHAM") @db.Char(10)
+  NgayLap           DateTime?           @db.Date
+  NgayYeuCau        DateTime?           @db.Date
+  TrangThai         String?             @db.NVarChar(50)
+  NgayPheDuyet      String?             @db.Char(10)
+  idNguoiDung       String?             @db.Char(10)
+  idNguoiPheDuyet   String?             @db.Char(10)
+  CT_YEUCAUDUOCPHAM CT_YEUCAUDUOCPHAM[]
+}
+
+model QUYEN {
+  idQuyen        String           @id(map: "PK_Quyen") @db.Char(10)
+  TenQuyen       String           @db.NVarChar(50)
+  NHOM_NGUOIDUNG NHOM_NGUOIDUNG[]
+}
+
+model QUYETDINH {
+  idQD        String    @id(map: "PK__QUYETDIN__9DB82094DBAD6EA5") @db.Char(10)
+  NgayBanHanh DateTime? @db.Date
+  NgayHieuLuc DateTime? @db.Date
+  File        String?   @db.VarChar(50)
+  idKhoa      String?   @db.Char(10)
+  KHOA        KHOA?     @relation(fields: [idKhoa], references: [idKhoa], onDelete: NoAction, onUpdate: NoAction, map: "FK_QUYETDINH_KHOA")
+}
+
+model THIETBI {
+  idThietBi       String            @id(map: "PK__THIETBI__920D1504935AB0D6") @db.Char(10)
+  TenTB           String?           @db.NVarChar(100)
+  LoaiTB          String?           @db.NVarChar(100)
+  DVT             String?           @db.NVarChar(20)
+  DonGiaMua       Decimal?          @db.Decimal(18, 2)
+  CAPPHAT_THIETBI CAPPHAT_THIETBI[]
+}
+
+model VACXIN {
+  idVacXin           String               @id(map: "PK_VACXIN") @db.Char(10)
+  TenVacXin          String?              @db.NVarChar(100)
+  NgayNhap           DateTime?            @db.Date
+  SoLuong            Int?
+  HSD                DateTime?            @db.Date
+  LieuTiem           String?              @db.NVarChar(50)
+  DonGiaMua          Decimal?             @db.Decimal(18, 0)
+  DonGiaBan          Decimal?             @db.Decimal(18, 0)
+  GhiChu             String?              @db.NVarChar(50)
+  idNCC              String?              @db.Char(10)
+  idLoaiVX           String?              @db.Char(10)
+  CT_GOI_VACXIN      CT_GOI_VACXIN[]
+  CT_HOADONTIEMCHUNG CT_HOADONTIEMCHUNG[]
+  P_KHAMBENH         P_KHAMBENH[]
+  PDK_TIEMCHUNG      PDK_TIEMCHUNG[]
+  LOAI_VACXIN        LOAI_VACXIN?         @relation(fields: [idLoaiVX], references: [idLoaiVX], onDelete: NoAction, onUpdate: NoAction, map: "FK_VACXIN_LOAI_VACXIN")
+  NCC                NCC?                 @relation(fields: [idNCC], references: [idNCC], onDelete: NoAction, onUpdate: NoAction, map: "FK_VACXIN_NCC")
+}
+
+model VATTU {
+  idVatTu   String    @id(map: "PK_VATTU") @db.Char(10)
+  SoLuong   Int?
+  TenVatTu  String?   @db.NVarChar(50)
+  DVT       String?   @db.NVarChar(50)
+  DonGiaMua Decimal?  @db.Decimal(18, 0)
+  TrangThai String?   @db.NVarChar(50)
+  GhiChu    String?   @db.NVarChar(50)
+  NgayNhap  DateTime? @db.Date
+  idKhoa    String?   @db.Char(10)
+  KHOA      KHOA?     @relation(fields: [idKhoa], references: [idKhoa], onDelete: NoAction, onUpdate: NoAction, map: "FK_VATTU_KHOA")
+}
