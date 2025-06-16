@@ -3,9 +3,11 @@ const prisma = require('../utils/prisma');
 // Lấy tất cả users
 const getAllUsers = async (req, res) => {
   try {
-    const users = await prisma.user.findMany(); // Thay 'user' bằng tên table thực tế
+    // Thay đổi 'user' thành tên table thực tế trong database của bạn
+    const users = await prisma.user.findMany();
     res.json(users);
   } catch (error) {
+    console.error('Error getting users:', error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -24,6 +26,7 @@ const getUserById = async (req, res) => {
     
     res.json(user);
   } catch (error) {
+    console.error('Error getting user by ID:', error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -36,6 +39,7 @@ const createUser = async (req, res) => {
     });
     res.status(201).json(user);
   } catch (error) {
+    console.error('Error creating user:', error);
     res.status(400).json({ error: error.message });
   }
 };
@@ -50,6 +54,7 @@ const updateUser = async (req, res) => {
     });
     res.json(user);
   } catch (error) {
+    console.error('Error updating user:', error);
     res.status(400).json({ error: error.message });
   }
 };
@@ -63,6 +68,7 @@ const deleteUser = async (req, res) => {
     });
     res.status(204).send();
   } catch (error) {
+    console.error('Error deleting user:', error);
     res.status(400).json({ error: error.message });
   }
 };

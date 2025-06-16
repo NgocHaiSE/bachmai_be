@@ -8,10 +8,11 @@ const {
   deleteUser
 } = require('../controllers/userController');
 
-router.get('/', getAllUsers);
-router.get('/:id', getUserById);
-router.post('/', createUser);
-router.put('/:id', updateUser);
-router.delete('/:id', deleteUser);
+// Routes cho user
+router.get('/', getAllUsers);           // GET /api/users
+router.get('/:id', getUserById);        // GET /api/users/:id
+router.post('/', createUser);           // POST /api/users
+router.put('/:id', updateUser);         // PUT /api/users/:id
+router.delete('/:id', deleteUser);      // DELETE /api/users/:id
 
 module.exports = router;
