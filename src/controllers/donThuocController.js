@@ -1,7 +1,5 @@
 const prisma = require('../utils/prisma');
 
-// ============ ĐƠN THUỐC ============
-
 // Thêm đơn thuốc
 const themDonThuoc = async (req, res) => {
   try {
@@ -22,7 +20,6 @@ const themDonThuoc = async (req, res) => {
       data: result
     });
   } catch (error) {
-    console.error('Error in themDonThuoc:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi tạo đơn thuốc',
@@ -48,7 +45,6 @@ const suaDonThuoc = async (req, res) => {
       message: 'Cập nhật đơn thuốc thành công'
     });
   } catch (error) {
-    console.error('Error in suaDonThuoc:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi cập nhật đơn thuốc',
@@ -71,7 +67,6 @@ const xoaDonThuoc = async (req, res) => {
       message: 'Xóa đơn thuốc thành công'
     });
   } catch (error) {
-    console.error('Error in xoaDonThuoc:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi xóa đơn thuốc',
@@ -91,13 +86,12 @@ const xacNhanThanhToanDonThuoc = async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Xác nhận thanh toán đơn thuốc thành công'
+      message: 'Xác nhận thanh toán thành công'
     });
   } catch (error) {
-    console.error('Error in xacNhanThanhToanDonThuoc:', error);
     res.status(500).json({
       success: false,
-      message: 'Lỗi khi xác nhận thanh toán đơn thuốc',
+      message: 'Lỗi khi xác nhận thanh toán',
       error: error.message
     });
   }
@@ -124,7 +118,6 @@ const layDonThuocTheoID = async (req, res) => {
       data: result[0]
     });
   } catch (error) {
-    console.error('Error in layDonThuocTheoID:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi lấy thông tin đơn thuốc',
@@ -158,7 +151,6 @@ const timKiemDonThuoc = async (req, res) => {
       data: result
     });
   } catch (error) {
-    console.error('Error in timKiemDonThuoc:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi tìm kiếm đơn thuốc',
@@ -167,14 +159,10 @@ const timKiemDonThuoc = async (req, res) => {
   }
 };
 
-// ============ CHI TIẾT ĐƠN THUỐC ============
-
 // Thêm chi tiết đơn thuốc
 const themChiTietDonThuoc = async (req, res) => {
   try {
-    const {
-      idDonThuoc, idDuocPham, SoLuong, LieuDung, DuongDung, GhiChu
-    } = req.body;
+    const { idDonThuoc, idDuocPham, SoLuong, LieuDung, DuongDung, GhiChu } = req.body;
 
     await prisma.$executeRaw`
       EXEC sp_ThemChiTietDonThuoc 
@@ -191,65 +179,9 @@ const themChiTietDonThuoc = async (req, res) => {
       message: 'Thêm dược phẩm vào đơn thuốc thành công'
     });
   } catch (error) {
-    console.error('Error in themChiTietDonThuoc:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi thêm dược phẩm vào đơn thuốc',
-      error: error.message
-    });
-  }
-};
-
-// Sửa chi tiết đơn thuốc
-const suaChiTietDonThuoc = async (req, res) => {
-  try {
-    const { idDonThuoc, idDuocPham } = req.params;
-    const { SoLuong, LieuDung, DuongDung, GhiChu } = req.body;
-
-    await prisma.$executeRaw`
-      EXEC sp_SuaChiTietDonThuoc 
-        @idDonThuoc = ${idDonThuoc},
-        @idDuocPham = ${idDuocPham},
-        @SoLuong = ${SoLuong},
-        @LieuDung = ${LieuDung},
-        @DuongDung = ${DuongDung},
-        @GhiChu = ${GhiChu}
-    `;
-
-    res.json({
-      success: true,
-      message: 'Cập nhật chi tiết đơn thuốc thành công'
-    });
-  } catch (error) {
-    console.error('Error in suaChiTietDonThuoc:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Lỗi khi cập nhật chi tiết đơn thuốc',
-      error: error.message
-    });
-  }
-};
-
-// Xóa chi tiết đơn thuốc
-const xoaChiTietDonThuoc = async (req, res) => {
-  try {
-    const { idDonThuoc, idDuocPham } = req.params;
-
-    await prisma.$executeRaw`
-      EXEC sp_XoaChiTietDonThuoc 
-        @idDonThuoc = ${idDonThuoc},
-        @idDuocPham = ${idDuocPham}
-    `;
-
-    res.json({
-      success: true,
-      message: 'Xóa dược phẩm khỏi đơn thuốc thành công'
-    });
-  } catch (error) {
-    console.error('Error in xoaChiTietDonThuoc:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Lỗi khi xóa dược phẩm khỏi đơn thuốc',
       error: error.message
     });
   }
@@ -269,7 +201,6 @@ const layChiTietDonThuoc = async (req, res) => {
       data: result
     });
   } catch (error) {
-    console.error('Error in layChiTietDonThuoc:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi lấy chi tiết đơn thuốc',
@@ -279,17 +210,12 @@ const layChiTietDonThuoc = async (req, res) => {
 };
 
 module.exports = {
-  // Đơn thuốc
   themDonThuoc,
   suaDonThuoc,
   xoaDonThuoc,
   xacNhanThanhToanDonThuoc,
   layDonThuocTheoID,
   timKiemDonThuoc,
-  
-  // Chi tiết đơn thuốc
   themChiTietDonThuoc,
-  suaChiTietDonThuoc,
-  xoaChiTietDonThuoc,
   layChiTietDonThuoc
 };
