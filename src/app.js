@@ -13,7 +13,8 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/', (req, res) => {
   res.json({ 
     message: 'Hospital Management System API đang hoạt động!',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    version: '1.0.0'
   });
 });
 
@@ -36,49 +37,59 @@ app.get('/api/test', async (req, res) => {
 });
 
 // Import routes
-const userRoutes = require('./routes/userRoutes');
-const benhNhanRoutes = require('./routes/benhNhanRoutes');
-const pdkKhamRoutes = require('./routes/pdkKhamRoutes');
-const chuyenVienRoutes = require('./routes/chuyenVienRoutes');
-const donThuocRoutes = require('./routes/donThuocRoutes');
-const duocPhamRoutes = require('./routes/duocPhamRoutes');
-const khamBenhRoutes = require('./routes/khamBenhRoutes');
-const vacXinRoutes = require('./routes/vacXinRoutes');
-const lichLamViecRoutes = require('./routes/lichLamViecRoutes');
+try {
+  const userRoutes = require('./routes/userRoutes');
+  const benhNhanRoutes = require('./routes/benhNhanRoutes');
+  const pdkKhamRoutes = require('./routes/pdkKhamRoutes');
+  const chuyenVienRoutes = require('./routes/chuyenVienRoutes');
+  const donThuocRoutes = require('./routes/donThuocRoutes');
+  const duocPhamRoutes = require('./routes/duocPhamRoutes');
+  const khamBenhRoutes = require('./routes/khamBenhRoutes');
+  const vacXinRoutes = require('./routes/vacXinRoutes');
+  const lichLamViecRoutes = require('./routes/lichLamViecRoutes');
 
-// Use routes
-app.use('/api/users', userRoutes);
-app.use('/api/benh-nhan', benhNhanRoutes);
-app.use('/api/pdk-kham', pdkKhamRoutes);
-app.use('/api/chuyen-vien', chuyenVienRoutes);
-app.use('/api/don-thuoc', donThuocRoutes);
-app.use('/api/duoc-pham', duocPhamRoutes);
-app.use('/api/kham-benh', khamBenhRoutes);
-app.use('/api/vac-xin', vacXinRoutes);
-app.use('/api/lich-lam-viec', lichLamViecRoutes);
+  // Use routes
+  app.use('/api/users', userRoutes);
+  app.use('/api/benh-nhan', benhNhanRoutes);
+  app.use('/api/pdk-kham', pdkKhamRoutes);
+  app.use('/api/chuyen-vien', chuyenVienRoutes);
+  app.use('/api/don-thuoc', donThuocRoutes);
+  app.use('/api/duoc-pham', duocPhamRoutes);
+  app.use('/api/kham-benh', khamBenhRoutes);
+  app.use('/api/vac-xin', vacXinRoutes);
+  app.use('/api/lich-lam-viec', lichLamViecRoutes);
+  
+  console.log('✅ All routes loaded successfully');
+} catch (error) {
+  console.error('❌ Error loading routes:', error.message);
+  console.error('Stack:', error.stack);
+}
 
 // Error handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ 
-    success: false,
-    message: 'Có lỗi xảy ra!'
-  });
-});
+// app.use((err, req, res, next) => {
+//   console.error('Error:', err.stack);
+//   res.status(500).json({ 
+//     success: false,
+//     message: 'Có lỗi xảy ra!',
+//     error: process.env.NODE_ENV === 'development' ? err.message : undefined
+//   });
+// });
 
 // 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({ 
-    success: false,
-    message: 'Route không tồn tại'
-  });
-});
+// app.use('*', (req, res) => {
+//   res.status(404).json({ 
+//     success: false,
+//     message: `Route không tồn tại: ${req.method} ${req.originalUrl}`
+//   });
+// });
 
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
-  console.log(`Server đang chạy trên port ${PORT}`);
-  console.log(`API URL: http://localhost:${PORT}`);
+  console.log('🏥 Hospital Management System Backend');
+  console.log(`🚀 Server đang chạy trên port ${PORT}`);
+  console.log(`📡 API URL: http://localhost:${PORT}`);
+  console.log(`🔗 Health check: http://localhost:${PORT}/api/test`);
 });
 
 module.exports = app;

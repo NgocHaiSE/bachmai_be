@@ -8,6 +8,7 @@ const themPhieuDangKyKham = async (req, res) => {
       TienSuBenhLyBanThan, TienSuBenhLyGiaDinh, ThuocDangSuDung,
       KhamBHYT, idBenhNhan, idKhoa
     } = req.body;
+    console.log(req.body);
 
     const result = await prisma.$executeRaw`
       DECLARE @idDKKhambenhMoi CHAR(10);
@@ -126,6 +127,26 @@ const xoaPhieuDangKyKham = async (req, res) => {
   }
 };
 
+const layPhieuDangKyKham = async (req, res) => {
+  try {
+    const result = await prisma.$queryRaw`
+      EXEC sp_PDK_KhamBenh_GetAll
+    `;
+
+    res.json({
+      success: true,
+      data: result
+    });
+  } catch (error) {
+    console.error('Error in layPhieuDangKyKham:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi lấy danh sách phiếu đăng ký khám',
+      error: error.message
+    });
+  }
+}
+
 // Lấy phiếu đăng ký khám theo ID
 const layPhieuDangKyKhamTheoID = async (req, res) => {
   try {
@@ -195,6 +216,7 @@ module.exports = {
   suaPhieuDangKyKham,
   capNhatTrangThaiPhieuKham,
   xoaPhieuDangKyKham,
+  layPhieuDangKyKham,
   layPhieuDangKyKhamTheoID,
   timKiemPhieuDangKyKham
 };

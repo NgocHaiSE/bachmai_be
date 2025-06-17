@@ -6,15 +6,17 @@ const {
   capNhatTrangThaiPhieuKham,
   xoaPhieuDangKyKham,
   layPhieuDangKyKhamTheoID,
-  timKiemPhieuDangKyKham
+  timKiemPhieuDangKyKham,
+  layPhieuDangKyKham
 } = require('../controllers/pdkKhamController');
 
-// Routes cho phiếu đăng ký khám
-router.post('/', themPhieuDangKyKham);                           // POST /api/pdk-kham - Thêm phiếu đăng ký khám
-router.put('/:id', suaPhieuDangKyKham);                          // PUT /api/pdk-kham/:id - Sửa phiếu đăng ký khám
-router.patch('/:id/trang-thai', capNhatTrangThaiPhieuKham);      // PATCH /api/pdk-kham/:id/trang-thai - Cập nhật trạng thái
-router.delete('/:id', xoaPhieuDangKyKham);                       // DELETE /api/pdk-kham/:id - Xóa phiếu đăng ký khám
-router.get('/search', timKiemPhieuDangKyKham);                   // GET /api/pdk-kham/search - Tìm kiếm phiếu đăng ký khám
-router.get('/:id', layPhieuDangKyKhamTheoID);                    // GET /api/pdk-kham/:id - Lấy phiếu đăng ký khám theo ID
+// Routes cho phiếu đăng ký khám - /search must come before /:id
+router.get('/search', timKiemPhieuDangKyKham);           // GET /api/pdk-kham/search
+router.post('/', themPhieuDangKyKham);                   // POST /api/pdk-kham
+router.get('/', layPhieuDangKyKham)
+router.get('/:id', layPhieuDangKyKhamTheoID);            // GET /api/pdk-kham/:id
+router.put('/:id', suaPhieuDangKyKham);                  // PUT /api/pdk-kham/:id
+router.patch('/:id/trang-thai', capNhatTrangThaiPhieuKham); // PATCH /api/pdk-kham/:id/trang-thai
+router.delete('/:id', xoaPhieuDangKyKham);               // DELETE /api/pdk-kham/:id
 
 module.exports = router;
