@@ -6,7 +6,7 @@ const themPhieuDangKyKham = async (req, res) => {
     const {
       LyDoKham, ThoiGianBatDauTrieuChung, PhongKhamSo,
       TienSuBenhLyBanThan, TienSuBenhLyGiaDinh, ThuocDangSuDung,
-      KhamBHYT, idBenhNhan, idKhoa
+      KhamBHYT, idBenhNhan, idKhoa, idNguoiDung
     } = req.body;
     console.log(req.body);
 
@@ -22,6 +22,7 @@ const themPhieuDangKyKham = async (req, res) => {
         @KhamBHYT = ${KhamBHYT},
         @idBenhNhan = ${idBenhNhan},
         @idKhoa = ${idKhoa},
+        @idNguoiDung = ${idNguoiDung},
         @idDKKhambenhMoi = @idDKKhambenhMoi OUTPUT;
       SELECT @idDKKhambenhMoi as idDKKhambenhMoi;
     `;

@@ -7,10 +7,10 @@ const layLichLamViecTuan = async (req, res) => {
   try {
     const { TuNgay, DenNgay, idKhoa } = req.query;
 
-    if (!TuNgay || !DenNgay || !idKhoa) {
+    if (!TuNgay || !DenNgay) {
       return res.status(400).json({
         success: false,
-        message: 'Vui lòng nhập đầy đủ thông tin: TuNgay, DenNgay, idKhoa'
+        message: 'Vui lòng nhập đầy đủ thông tin: TuNgay, DenNgay'
       });
     }
 
@@ -18,7 +18,7 @@ const layLichLamViecTuan = async (req, res) => {
       EXEC sp_LayLichLamViecTuan 
         @TuNgay = ${TuNgay},
         @DenNgay = ${DenNgay},
-        @idKhoa = ${idKhoa}
+        @idKhoa = ${idKhoa || null}
     `;
     
     res.json({
@@ -35,6 +35,84 @@ const layLichLamViecTuan = async (req, res) => {
   }
 };
 
+// Lấy danh sách tất cả ca làm việc với filter
+const layDanhSachCaLamViec = async (req, res) => {
+  try {
+    const { TuNgay, DenNgay, idKhoa, TrangThai } = req.query;
+    
+    let whereClause = [];
+    let params = [];
+
+    if (TuNgay && DenNgay) {
+      whereClause.push(`NgayLamViec BETWEEN ? AND ?`);
+      params.push(TuNgay, DenNgay);
+    }
+    
+    if (idKhoa) {
+      whereClause.push(`idKhoa = ?`);
+      params.push(idKhoa);
+    }
+    
+    if (TrangThai) {
+      whereClause.push(`TrangThai = ?`);
+      params.push(TrangThai);
+    }
+
+    const whereStatement = whereClause.length > 0 ? `WHERE ${whereClause.join(' AND ')}` : '';
+    
+    const result = await prisma.$queryRawUnsafe(`
+      SELECT 
+        clv.*,
+        nv.HoTen AS TenNhanVien,
+        k.TenKhoa,
+        nd_tao.HoTen AS TenNguoiTao,
+        nd_duyet.HoTen AS TenNguoiPheDuyet
+      FROM CALAMVIEC clv
+      LEFT JOIN NGUOIDUNG nv ON clv.idNhanVien = nv.idNguoiDung  
+      LEFT JOIN KHOA k ON clv.idKhoa = k.idKhoa
+      LEFT JOIN NGUOIDUNG nd_tao ON clv.idNguoiDung = nd_tao.idNguoiDung
+      LEFT JOIN NGUOIDUNG nd_duyet ON clv.idNguoiPheDuyet = nd_duyet.idNguoiDung
+      ${whereStatement}
+      ORDER BY clv.NgayLamViec DESC, clv.GioBD
+    `, ...params);
+    
+    res.json({
+      success: true,
+      data: result
+    });
+  } catch (error) {
+    console.error('Error in layDanhSachCaLamViec:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi lấy danh sách ca làm việc',
+      error: error.message
+    });
+  }
+};
+
+// Lấy thống kê lịch làm việc
+const layThongKeLichLamViec = async (req, res) => {
+  try {
+    const { thang } = req.query; // Format: YYYY-MM
+
+    const result = await prisma.$queryRaw`
+      EXEC sp_LayThongKeLichLamViec @Thang = ${thang || null}
+    `;
+    
+    res.json({
+      success: true,
+      data: result[0]
+    });
+  } catch (error) {
+    console.error('Error in layThongKeLichLamViec:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi lấy thống kê lịch làm việc',
+      error: error.message
+    });
+  }
+};
+
 // ============ CA LÀM VIỆC ============
 
 // Thêm ca làm việc
@@ -45,7 +123,15 @@ const themCaLamViec = async (req, res) => {
       LoaiCongViec, GhiChu, idKhoa, idLichTongThe
     } = req.body;
 
-    const result = await prisma.$executeRaw`
+    // Validation
+    if (!idNhanVien || !NgayLamViec || !LoaiCa || !GioBD || !GioKT || !idKhoa) {
+      return res.status(400).json({
+        success: false,
+        message: 'Vui lòng nhập đầy đủ thông tin bắt buộc'
+      });
+    }
+
+    const result = await prisma.$queryRaw`
       DECLARE @idCaLamViecMoi CHAR(10);
       EXEC sp_ThemCaLamViec 
         @idNhanVien = ${idNhanVien},
@@ -64,13 +150,13 @@ const themCaLamViec = async (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Thêm ca làm việc thành công',
-      data: result
+      data: { idCaLamViecMoi: result[0]?.idCaLamViecMoi }
     });
   } catch (error) {
     console.error('Error in themCaLamViec:', error);
     res.status(500).json({
       success: false,
-      message: 'Lỗi khi thêm ca làm việc',
+      message: error.message.includes('Lỗi:') ? error.message : 'Lỗi khi thêm ca làm việc',
       error: error.message
     });
   }
@@ -106,7 +192,7 @@ const suaCaLamViec = async (req, res) => {
     console.error('Error in suaCaLamViec:', error);
     res.status(500).json({
       success: false,
-      message: 'Lỗi khi cập nhật ca làm việc',
+      message: error.message.includes('Lỗi:') ? error.message : 'Lỗi khi cập nhật ca làm việc',
       error: error.message
     });
   }
@@ -129,7 +215,7 @@ const xacNhanCaLamViec = async (req, res) => {
     console.error('Error in xacNhanCaLamViec:', error);
     res.status(500).json({
       success: false,
-      message: 'Lỗi khi xác nhận ca làm việc',
+      message: error.message.includes('Lỗi:') ? error.message : 'Lỗi khi xác nhận ca làm việc',
       error: error.message
     });
   }
@@ -152,7 +238,7 @@ const xoaCaLamViec = async (req, res) => {
     console.error('Error in xoaCaLamViec:', error);
     res.status(500).json({
       success: false,
-      message: 'Lỗi khi xóa ca làm việc',
+      message: error.message.includes('Lỗi:') ? error.message : 'Lỗi khi xóa ca làm việc',
       error: error.message
     });
   }
@@ -190,6 +276,58 @@ const layChiTietCaLamViec = async (req, res) => {
 
 // ============ YÊU CẦU CHUYỂN CA ============
 
+// Lấy danh sách yêu cầu chuyển ca
+const layDanhSachYeuCauChuyenCa = async (req, res) => {
+  try {
+    const { TrangThai, TuNgay, DenNgay } = req.query;
+    
+    let whereClause = [];
+    let params = [];
+
+    if (TrangThai) {
+      whereClause.push(`pyc.TrangThai = ?`);
+      params.push(TrangThai);
+    }
+    
+    if (TuNgay && DenNgay) {
+      whereClause.push(`pyc.NgayYeuCau BETWEEN ? AND ?`);
+      params.push(TuNgay, DenNgay);
+    }
+
+    const whereStatement = whereClause.length > 0 ? `WHERE ${whereClause.join(' AND ')}` : '';
+    
+    const result = await prisma.$queryRawUnsafe(`
+      SELECT 
+        pyc.*,
+        nv_cu.HoTen AS TenNhanVienCu,
+        nv_moi.HoTen AS TenNhanVienMoi,
+        ca_goc.NgayLamViec, ca_goc.LoaiCa, ca_goc.GioBD, ca_goc.GioKT,
+        nd_tao.HoTen AS TenNguoiTao,
+        nd_duyet.HoTen AS TenNguoiPheDuyet
+      FROM PYC_CHUYENCA pyc
+      LEFT JOIN NHANVIEN nv_cu ON pyc.idNhanVienCu = nv_cu.idNhanVien
+      LEFT JOIN NHANVIEN nv_moi ON pyc.idNhanVienMoi = nv_moi.idNhanVien
+      LEFT JOIN CALAMVIEC ca_goc ON pyc.idCaLamViecGoc = ca_goc.idCaLamViec
+      LEFT JOIN NGUOIDUNG nd_tao ON pyc.idNguoiDung = nd_tao.idNguoiDung
+      LEFT JOIN NGUOIDUNG nd_duyet ON pyc.idNguoiPheDuyet = nd_duyet.idNguoiDung
+      ${whereStatement}
+      ORDER BY pyc.NgayYeuCau DESC
+    `, ...params);
+    
+    res.json({
+      success: true,
+      data: result
+    });
+  } catch (error) {
+    console.error('Error in layDanhSachYeuCauChuyenCa:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi lấy danh sách yêu cầu chuyển ca',
+      error: error.message
+    });
+  }
+};
+
 // Tạo yêu cầu chuyển ca
 const taoYeuCauChuyenCa = async (req, res) => {
   try {
@@ -198,14 +336,21 @@ const taoYeuCauChuyenCa = async (req, res) => {
       CanBuCa, GhiChu
     } = req.body;
 
-    const result = await prisma.$executeRaw`
+    if (!idCaLamViecGoc || !idNhanVienMoi || !LyDo) {
+      return res.status(400).json({
+        success: false,
+        message: 'Vui lòng nhập đầy đủ thông tin bắt buộc'
+      });
+    }
+
+    const result = await prisma.$queryRaw`
       DECLARE @idYeuCauMoi CHAR(10);
       EXEC sp_TaoYeuCauChuyenCa 
         @idCaLamViecGoc = ${idCaLamViecGoc},
         @idNhanVienMoi = ${idNhanVienMoi},
         @NgayChuyen = ${NgayChuyen},
         @LyDo = ${LyDo},
-        @CanBuCa = ${CanBuCa},
+        @CanBuCa = ${CanBuCa || false},
         @GhiChu = ${GhiChu},
         @idYeuCauMoi = @idYeuCauMoi OUTPUT;
       SELECT @idYeuCauMoi as idYeuCauMoi;
@@ -214,13 +359,13 @@ const taoYeuCauChuyenCa = async (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Tạo yêu cầu chuyển ca thành công',
-      data: result
+      data: { idYeuCauMoi: result[0]?.idYeuCauMoi }
     });
   } catch (error) {
     console.error('Error in taoYeuCauChuyenCa:', error);
     res.status(500).json({
       success: false,
-      message: 'Lỗi khi tạo yêu cầu chuyển ca',
+      message: error.message.includes('Lỗi:') ? error.message : 'Lỗi khi tạo yêu cầu chuyển ca',
       error: error.message
     });
   }
@@ -252,7 +397,7 @@ const suaYeuCauChuyenCa = async (req, res) => {
     console.error('Error in suaYeuCauChuyenCa:', error);
     res.status(500).json({
       success: false,
-      message: 'Lỗi khi cập nhật yêu cầu chuyển ca',
+      message: error.message.includes('Lỗi:') ? error.message : 'Lỗi khi cập nhật yêu cầu chuyển ca',
       error: error.message
     });
   }
@@ -273,13 +418,13 @@ const xuLyYeuCauChuyenCa = async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Xử lý yêu cầu chuyển ca thành công'
+      message: `${IsApproved ? 'Phê duyệt' : 'Từ chối'} yêu cầu chuyển ca thành công`
     });
   } catch (error) {
     console.error('Error in xuLyYeuCauChuyenCa:', error);
     res.status(500).json({
       success: false,
-      message: 'Lỗi khi xử lý yêu cầu chuyển ca',
+      message: error.message.includes('Lỗi:') ? error.message : 'Lỗi khi xử lý yêu cầu chuyển ca',
       error: error.message
     });
   }
@@ -302,7 +447,7 @@ const xoaYeuCauChuyenCa = async (req, res) => {
     console.error('Error in xoaYeuCauChuyenCa:', error);
     res.status(500).json({
       success: false,
-      message: 'Lỗi khi xóa yêu cầu chuyển ca',
+      message: error.message.includes('Lỗi:') ? error.message : 'Lỗi khi xóa yêu cầu chuyển ca',
       error: error.message
     });
   }
@@ -340,6 +485,54 @@ const layChiTietYeuCauChuyenCa = async (req, res) => {
 
 // ============ ĐƠN NGHỈ PHÉP ============
 
+// Lấy danh sách đơn nghỉ phép
+const layDanhSachDonNghiPhep = async (req, res) => {
+  try {
+    const { TrangThai, TuNgay, DenNgay } = req.query;
+    
+    let whereClause = [];
+    let params = [];
+
+    if (TrangThai) {
+      whereClause.push(`dnp.TrangThai = ?`);
+      params.push(TrangThai);
+    }
+    
+    if (TuNgay && DenNgay) {
+      whereClause.push(`dnp.NgayLap BETWEEN ? AND ?`);
+      params.push(TuNgay, DenNgay);
+    }
+
+    const whereStatement = whereClause.length > 0 ? `WHERE ${whereClause.join(' AND ')}` : '';
+    
+    const result = await prisma.$queryRawUnsafe(`
+      SELECT 
+        dnp.*,
+        nv.HoTen AS TenNhanVien,
+        nd_duyet.HoTen AS TenNguoiPheDuyet,
+        nv_thaythe.HoTen AS TenNhanVienThayThe
+      FROM DON_NGHIPHEP dnp
+      LEFT JOIN NHANVIEN nv ON dnp.idNhanVien = nv.idNhanVien
+      LEFT JOIN NGUOIDUNG nd_duyet ON dnp.idNguoiPheDuyet = nd_duyet.idNguoiDung
+      LEFT JOIN NHANVIEN nv_thaythe ON dnp.idNhanVienThayThe = nv_thaythe.idNhanVien
+      ${whereStatement}
+      ORDER BY dnp.NgayLap DESC
+    `, ...params);
+    
+    res.json({
+      success: true,
+      data: result
+    });
+  } catch (error) {
+    console.error('Error in layDanhSachDonNghiPhep:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi lấy danh sách đơn nghỉ phép',
+      error: error.message
+    });
+  }
+};
+
 // Tạo đơn nghỉ phép
 const taoDonNghiPhep = async (req, res) => {
   try {
@@ -349,7 +542,14 @@ const taoDonNghiPhep = async (req, res) => {
       MoiQuanHe, GhiChu, idNhanVienThayThe
     } = req.body;
 
-    const result = await prisma.$executeRaw`
+    if (!LoaiPhep || !NgayBD || !NgayKT || !LyDo) {
+      return res.status(400).json({
+        success: false,
+        message: 'Vui lòng nhập đầy đủ thông tin bắt buộc'
+      });
+    }
+
+    const result = await prisma.$queryRaw`
       DECLARE @idNghiPhepMoi CHAR(10);
       EXEC sp_TaoDonNghiPhep 
         @LoaiPhep = ${LoaiPhep},
@@ -357,7 +557,7 @@ const taoDonNghiPhep = async (req, res) => {
         @NgayKT = ${NgayKT},
         @GioBD = ${GioBD},
         @GioKT = ${GioKT},
-        @NghiCaNgay = ${NghiCaNgay},
+        @NghiCaNgay = ${NghiCaNgay || true},
         @TongNgayNghi = ${TongNgayNghi},
         @LyDo = ${LyDo},
         @HoTenNguoiLienHe = ${HoTenNguoiLienHe},
@@ -372,13 +572,13 @@ const taoDonNghiPhep = async (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Tạo đơn nghỉ phép thành công',
-      data: result
+      data: { idNghiPhepMoi: result[0]?.idNghiPhepMoi }
     });
   } catch (error) {
     console.error('Error in taoDonNghiPhep:', error);
     res.status(500).json({
       success: false,
-      message: 'Lỗi khi tạo đơn nghỉ phép',
+      message: error.message.includes('Lỗi:') ? error.message : 'Lỗi khi tạo đơn nghỉ phép',
       error: error.message
     });
   }
@@ -420,7 +620,7 @@ const suaDonNghiPhep = async (req, res) => {
     console.error('Error in suaDonNghiPhep:', error);
     res.status(500).json({
       success: false,
-      message: 'Lỗi khi cập nhật đơn nghỉ phép',
+      message: error.message.includes('Lỗi:') ? error.message : 'Lỗi khi cập nhật đơn nghỉ phép',
       error: error.message
     });
   }
@@ -441,13 +641,13 @@ const xuLyDonNghiPhep = async (req, res) => {
 
     res.json({
       success: true,
-      message: 'Xử lý đơn nghỉ phép thành công'
+      message: `${IsApproved ? 'Phê duyệt' : 'Từ chối'} đơn nghỉ phép thành công`
     });
   } catch (error) {
     console.error('Error in xuLyDonNghiPhep:', error);
     res.status(500).json({
       success: false,
-      message: 'Lỗi khi xử lý đơn nghỉ phép',
+      message: error.message.includes('Lỗi:') ? error.message : 'Lỗi khi xử lý đơn nghỉ phép',
       error: error.message
     });
   }
@@ -470,7 +670,7 @@ const xoaDonNghiPhep = async (req, res) => {
     console.error('Error in xoaDonNghiPhep:', error);
     res.status(500).json({
       success: false,
-      message: 'Lỗi khi xóa đơn nghỉ phép',
+      message: error.message.includes('Lỗi:') ? error.message : 'Lỗi khi xóa đơn nghỉ phép',
       error: error.message
     });
   }
@@ -529,9 +729,75 @@ const layCacCaBiAnhHuong = async (req, res) => {
   }
 };
 
+// ============ HELPER FUNCTIONS ============
+
+// Lấy danh sách nhân viên
+const layDanhSachNhanVien = async (req, res) => {
+  try {
+    const { idKhoa } = req.query;
+    
+    let whereClause = '';
+    let params = [];
+    
+    if (idKhoa) {
+      whereClause = 'WHERE nv.idKhoa = ?';
+      params.push(idKhoa);
+    }
+    
+    const result = await prisma.$queryRawUnsafe(`
+      SELECT 
+        nv.idNhanVien as _id,
+        nv.HoTen,
+        nv.ChucVu,
+        k.TenKhoa as department,
+        nv.HoTen as firstName,
+        '' as lastName
+      FROM NHANVIEN nv
+      LEFT JOIN KHOA k ON nv.idKhoa = k.idKhoa
+      ${whereClause}
+      ORDER BY nv.HoTen
+    `, ...params);
+    
+    res.json({
+      success: true,
+      data: result
+    });
+  } catch (error) {
+    console.error('Error in layDanhSachNhanVien:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi lấy danh sách nhân viên',
+      error: error.message
+    });
+  }
+};
+
+// Lấy danh sách khoa
+const layDanhSachKhoa = async (req, res) => {
+  try {
+    const result = await prisma.$queryRaw`
+      SELECT idKhoa, TenKhoa FROM KHOA WHERE TrangThai = N'Hoạt động' ORDER BY TenKhoa
+    `;
+    
+    res.json({
+      success: true,
+      data: result
+    });
+  } catch (error) {
+    console.error('Error in layDanhSachKhoa:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi lấy danh sách khoa',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   // Lịch làm việc
   layLichLamViecTuan,
+  layDanhSachCaLamViec,
+  layThongKeLichLamViec,
   
   // Ca làm việc
   themCaLamViec,
@@ -541,6 +807,7 @@ module.exports = {
   layChiTietCaLamViec,
   
   // Yêu cầu chuyển ca
+  layDanhSachYeuCauChuyenCa,
   taoYeuCauChuyenCa,
   suaYeuCauChuyenCa,
   xuLyYeuCauChuyenCa,
@@ -548,10 +815,15 @@ module.exports = {
   layChiTietYeuCauChuyenCa,
   
   // Đơn nghỉ phép
+  layDanhSachDonNghiPhep,
   taoDonNghiPhep,
   suaDonNghiPhep,
   xuLyDonNghiPhep,
   xoaDonNghiPhep,
   layChiTietDonNghiPhep,
-  layCacCaBiAnhHuong
+  layCacCaBiAnhHuong,
+  
+  // Helper functions
+  layDanhSachNhanVien,
+  layDanhSachKhoa
 };

@@ -570,12 +570,10 @@ model P_CHUYENVIEN {
   ThoiGianDuKien     DateTime?       @db.Time
   SDT_CoSoYTe        String?         @db.VarChar(20)
   YThuc              String?         @db.NVarChar(200)
-  PhuongTien         String?         @db.NVarChar(200)
   GhiChu             String?         @db.NVarChar(200)
   TrangThai          String?         @db.NVarChar(50)
   NgayPheDuyet       DateTime?       @db.Date
   idYeuCauChuyenVien String?         @db.Char(10)
-  idNguoiDiKem       String?         @db.Char(10)
   idNguoiPheDuyet    String?         @db.Char(10)
   idNguoiDung        String?         @db.Char(10)
   PYC_CHUYENVIEN     PYC_CHUYENVIEN? @relation(fields: [idYeuCauChuyenVien], references: [idYeuCauChuyenVien], onDelete: NoAction, onUpdate: NoAction, map: "FK_P_CHUYENVIEN_PYC_CHUYENVIEN")

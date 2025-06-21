@@ -2,6 +2,43 @@ const prisma = require('../utils/prisma');
 
 // ============ YÊU CẦU CHUYỂN VIỆN ============
 
+const layDanhSachYeuCauChuyenVien = async (req, res) => {
+  try {
+    const result = await prisma.$queryRaw`EXEC sp_LayDanhSachYeuCauChuyenVien`;
+
+    res.json({
+      success: true,
+      data: result
+    });
+  } catch (error) {
+    console.error('Error in layDanhSachYeuCauChuyenVien:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi lấy danh sách yêu cầu chuyển viện',
+      error: error.message
+    });
+  }
+};
+
+// Lấy danh sách phiếu chuyển viện
+const layDanhSachPhieuChuyenVien = async (req, res) => {
+  try {
+    const result = await prisma.$queryRaw`EXEC sp_LayDanhSachPhieuChuyenVien`;
+
+    res.json({
+      success: true,
+      data: result
+    });
+  } catch (error) {
+    console.error('Error in layDanhSachPhieuChuyenVien:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi lấy danh sách phiếu chuyển viện',
+      error: error.message
+    });
+  }
+};
+
 // Thêm phiếu yêu cầu chuyển viện
 const themPhieuYeuCauChuyenVien = async (req, res) => {
   try {
@@ -9,6 +46,8 @@ const themPhieuYeuCauChuyenVien = async (req, res) => {
       LyDo, CoSoChuyenDen, DiaChi, NgayChuyen, MucDo,
       GhiChu, idBacSiPhuTrach, idBenhNhan, idNguoiDung
     } = req.body;
+
+    console.log(req.body)
 
     const result = await prisma.$executeRaw`
       DECLARE @idYeuCauMoi CHAR(10);
@@ -128,12 +167,12 @@ const xoaPhieuYeuCauChuyenVien = async (req, res) => {
 };
 
 // Lấy phiếu yêu cầu chuyển viện theo ID
-const layPhieuYeuCauChuyenVienTheoID = async (req, res) => {
+const layChiTietYeuCauChuyenVien = async (req, res) => {
   try {
     const { id } = req.params;
     
     const result = await prisma.$queryRaw`
-      EXEC sp_LayPhieuYeuCauChuyenVienTheoID @idYeuCauChuyenVien = ${id}
+      EXEC sp_LayChiTietYeuCauChuyenVien @idYeuCauChuyenVien = ${id}
     `;
     
     if (result.length === 0) {
@@ -148,7 +187,7 @@ const layPhieuYeuCauChuyenVienTheoID = async (req, res) => {
       data: result[0]
     });
   } catch (error) {
-    console.error('Error in layPhieuYeuCauChuyenVienTheoID:', error);
+    console.error('Error in layChiTietYeuCauChuyenVien:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi lấy thông tin phiếu yêu cầu chuyển viện',
@@ -158,23 +197,16 @@ const layPhieuYeuCauChuyenVienTheoID = async (req, res) => {
 };
 
 // Tìm kiếm phiếu yêu cầu chuyển viện
-const timKiemPhieuYeuCauChuyenVien = async (req, res) => {
+const timKiemYeuCauChuyenVien = async (req, res) => {
   try {
-    const { TuNgay, DenNgay, TrangThai, Keyword } = req.query;
-
-    if (!TuNgay || !DenNgay) {
-      return res.status(400).json({
-        success: false,
-        message: 'Vui lòng nhập khoảng thời gian tìm kiếm'
-      });
-    }
+    const { tuKhoa, trangThai, tuNgay, denNgay } = req.query;
 
     const result = await prisma.$queryRaw`
-      EXEC sp_TimKiemPhieuYeuCauChuyenVien 
-        @TuNgay = ${TuNgay},
-        @DenNgay = ${DenNgay},
-        @TrangThai = ${TrangThai || null},
-        @Keyword = ${Keyword || null}
+      EXEC sp_TimKiemYeuCauChuyenVien
+        @tuKhoa = ${tuKhoa || null},
+        @trangThai = ${trangThai || null},
+        @tuNgay = ${tuNgay || null},
+        @denNgay = ${denNgay || null}
     `;
     
     res.json({
@@ -182,7 +214,7 @@ const timKiemPhieuYeuCauChuyenVien = async (req, res) => {
       data: result
     });
   } catch (error) {
-    console.error('Error in timKiemPhieuYeuCauChuyenVien:', error);
+    console.error('Error in timKiemYeuCauChuyenVien:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi tìm kiếm phiếu yêu cầu chuyển viện',
@@ -198,8 +230,9 @@ const taoPhieuChuyenVien = async (req, res) => {
   try {
     const {
       idYeuCauChuyenVien, NgayChuyen, ThoiGianDuKien, SDT_CoSoYTe,
-      YThuc, PhuongTien, GhiChu, idNguoiDiKem
+      YThuc, GhiChu, idNguoiDung 
     } = req.body;
+    console.log('Request body:', req.body);
 
     const result = await prisma.$executeRaw`
       DECLARE @idChuyenVienMoi CHAR(10);
@@ -209,9 +242,8 @@ const taoPhieuChuyenVien = async (req, res) => {
         @ThoiGianDuKien = ${ThoiGianDuKien},
         @SDT_CoSoYTe = ${SDT_CoSoYTe},
         @YThuc = ${YThuc},
-        @PhuongTien = ${PhuongTien},
         @GhiChu = ${GhiChu},
-        @idNguoiDiKem = ${idNguoiDiKem},
+        @idNguoiDung = ${idNguoiDung},
         @idChuyenVienMoi = @idChuyenVienMoi OUTPUT;
       SELECT @idChuyenVienMoi as idChuyenVienMoi;
     `;
@@ -237,7 +269,7 @@ const suaPhieuChuyenVien = async (req, res) => {
     const { id } = req.params;
     const {
       NgayChuyen, ThoiGianDuKien, SDT_CoSoYTe,
-      YThuc, PhuongTien, GhiChu, idNguoiDiKem
+      YThuc, GhiChu
     } = req.body;
 
     await prisma.$executeRaw`
@@ -247,9 +279,7 @@ const suaPhieuChuyenVien = async (req, res) => {
         @ThoiGianDuKien = ${ThoiGianDuKien},
         @SDT_CoSoYTe = ${SDT_CoSoYTe},
         @YThuc = ${YThuc},
-        @PhuongTien = ${PhuongTien},
-        @GhiChu = ${GhiChu},
-        @idNguoiDiKem = ${idNguoiDiKem}
+        @GhiChu = ${GhiChu}
     `;
 
     res.json({
@@ -317,12 +347,12 @@ const xoaPhieuChuyenVien = async (req, res) => {
 };
 
 // Lấy phiếu chuyển viện theo ID
-const layPhieuChuyenVienTheoID = async (req, res) => {
+const layChiTietPhieuChuyenVien = async (req, res) => {
   try {
     const { id } = req.params;
     
     const result = await prisma.$queryRaw`
-      EXEC sp_LayPhieuChuyenVienTheoID @idChuyenVien = ${id}
+      EXEC sp_LayChiTietPhieuChuyenVien @idChuyenVien = ${id}
     `;
     
     if (result.length === 0) {
@@ -337,7 +367,7 @@ const layPhieuChuyenVienTheoID = async (req, res) => {
       data: result[0]
     });
   } catch (error) {
-    console.error('Error in layPhieuChuyenVienTheoID:', error);
+    console.error('Error in layChiTietPhieuChuyenVien:', error);
     res.status(500).json({
       success: false,
       message: 'Lỗi khi lấy thông tin phiếu chuyển viện',
@@ -349,23 +379,15 @@ const layPhieuChuyenVienTheoID = async (req, res) => {
 // Tìm kiếm phiếu chuyển viện
 const timKiemPhieuChuyenVien = async (req, res) => {
   try {
-    const { TuNgay, DenNgay, TrangThai, Keyword } = req.query;
-
-    if (!TuNgay || !DenNgay) {
-      return res.status(400).json({
-        success: false,
-        message: 'Vui lòng nhập khoảng thời gian tìm kiếm'
-      });
-    }
+    const { tuKhoa, trangThai, tuNgay, denNgay } = req.query;
 
     const result = await prisma.$queryRaw`
-      EXEC sp_TimKiemPhieuChuyenVien 
-        @TuNgay = ${TuNgay},
-        @DenNgay = ${DenNgay},
-        @TrangThai = ${TrangThai || null},
-        @Keyword = ${Keyword || null}
+      EXEC sp_TimKiemPhieuChuyenVien_V2
+        @tuKhoa = ${tuKhoa || null},
+        @trangThai = ${trangThai || null},
+        @tuNgay = ${tuNgay || null},
+        @denNgay = ${denNgay || null}
     `;
-    
     res.json({
       success: true,
       data: result
@@ -386,14 +408,16 @@ module.exports = {
   suaPhieuYeuCauChuyenVien,
   xuLyPhieuYeuCauChuyenVien,
   xoaPhieuYeuCauChuyenVien,
-  layPhieuYeuCauChuyenVienTheoID,
-  timKiemPhieuYeuCauChuyenVien,
+  layChiTietYeuCauChuyenVien,
+  timKiemYeuCauChuyenVien,
+  layDanhSachYeuCauChuyenVien,
   
   // Phiếu chuyển viện
   taoPhieuChuyenVien,
   suaPhieuChuyenVien,
   capNhatTrangThaiChuyenVien,
   xoaPhieuChuyenVien,
-  layPhieuChuyenVienTheoID,
-  timKiemPhieuChuyenVien
+  layChiTietPhieuChuyenVien,
+  timKiemPhieuChuyenVien,
+  layDanhSachPhieuChuyenVien
 };

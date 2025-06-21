@@ -1,13 +1,28 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const session = require('express-session');
 
 const app = express();
 
 // Middleware cơ bản
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173', // ĐÚNG PORT FE của bạn!
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your_secret_key', // đặt ở biến môi trường là tốt nhất
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: false, // true nếu dùng HTTPS
+    maxAge: 24 * 60 * 60 * 1000, // 1 ngày
+    sameSite: 'lax', // hoặc 'none' nếu dùng frontend ở domain khác và có HTTPS
+  }
+}));
 
 // Health check route
 app.get('/', (req, res) => {
@@ -47,6 +62,9 @@ try {
   const khamBenhRoutes = require('./routes/khamBenhRoutes');
   const vacXinRoutes = require('./routes/vacXinRoutes');
   const lichLamViecRoutes = require('./routes/lichLamViecRoutes');
+  const authRoutes = require('./routes/authRoutes');
+  const khoaRoutes = require('./routes/khoaRoutes');
+  const nhanVienRoutes = require('./routes/nhanVienRoutes');
 
   // Use routes
   app.use('/api/users', userRoutes);
@@ -58,6 +76,10 @@ try {
   app.use('/api/kham-benh', khamBenhRoutes);
   app.use('/api/vac-xin', vacXinRoutes);
   app.use('/api/lich-lam-viec', lichLamViecRoutes);
+  app.use('/api/auth', authRoutes)
+  app.use('/api/khoa', khoaRoutes)
+  app.use('/api/nhan-vien', nhanVienRoutes)
+  
   
   console.log('✅ All routes loaded successfully');
 } catch (error) {
