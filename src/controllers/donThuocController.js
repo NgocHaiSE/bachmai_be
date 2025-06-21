@@ -1,6 +1,7 @@
 // src/controllers/donThuocController.js - Corrected for actual database structure
 const prisma = require('../utils/prisma');
 
+
 // Helper function để format dữ liệu đơn thuốc
 const formatPrescriptionData = (rawData) => {
   return rawData.map(item => {
@@ -49,6 +50,7 @@ const formatPrescriptionData = (rawData) => {
 const timKiemDonThuoc = async (req, res) => {
   try {
     const { TuNgay, DenNgay, TrangThai, Keyword } = req.query;
+    console.log(req.query);
 
     // Parse date strings thành Date objects hoặc null
     const parsedTuNgay = TuNgay ? new Date(TuNgay) : null;

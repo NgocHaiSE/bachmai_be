@@ -1,5 +1,6 @@
 const prisma = require('../utils/prisma');
 
+
 // Lấy chi tiết phiếu khám theo ID
 const layChiTietPhieuKham = async (req, res) => {
   try {
