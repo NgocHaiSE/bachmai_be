@@ -12,7 +12,7 @@ const {
   layChiTietDonThuoc,
   themChiTietDonThuoc,
   layDanhSachBacSi,
-  layDanhSachBenhNhan
+  layKhamBenhTheoIdBenhNhan,layDanhSachBenhNhan
 } = require('../controllers/donThuocController');
 
 // Routes cho đơn thuốc
@@ -20,6 +20,7 @@ router.get('/', layTatCaDonThuoc);                               // GET /api/don
 router.get('/search', timKiemDonThuoc);                          // GET /api/don-thuoc/search - Tìm kiếm đơn thuốc
 router.get('/bac-si', layDanhSachBacSi);                         // GET /api/don-thuoc/bac-si - Lấy danh sách bác sĩ
 router.get('/benh-nhan', layDanhSachBenhNhan);                   // GET /api/don-thuoc/benh-nhan - Lấy danh sách bệnh nhân
+router.get('/:id/PKB', layKhamBenhTheoIdBenhNhan);                   // GET /api/don-thuoc/benh-nhan - Lấy danh sách phiếu khám bệnh
 router.get('/:id/chi-tiet', layChiTietDonThuoc);                 // GET /api/don-thuoc/:id/chi-tiet - Lấy chi tiết đơn thuốc
 router.get('/:id', layDonThuocTheoID);                           // GET /api/don-thuoc/:id - Lấy đơn thuốc theo ID
 router.post('/', themDonThuoc);                                  // POST /api/don-thuoc - Tạo đơn thuốc mới

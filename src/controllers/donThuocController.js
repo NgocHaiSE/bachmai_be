@@ -29,13 +29,16 @@ const formatPrescriptionData = (rawData) => {
         address: item.BenhNhan_DiaChi || '',
         insuranceNumber: item.SoBHYT || ''
       },
+      idKhamBenh:item.idKhamBenh || '',
+      KhamBHYT:item.KhamBHYT || false,
+      MucHuong:item.MucHuong || 0,
       doctor: {
         _id: item.BacSi_Id,
         firstName: doctorFirstName,
         lastName: doctorLastName,
         department: item.BacSi_ChucVu || ''
       },
-      diagnosis: item.ChanDoan || '',
+      ChanDoan: item.ChanDoan || '',
       totalAmount: parseFloat(item.TotalAmount) || 0,
       insuranceAmount: parseFloat(item.InsuranceAmount) || 0,
       finalAmount: parseFloat(item.FinalAmount) || 0,
@@ -82,6 +85,35 @@ const timKiemDonThuoc = async (req, res) => {
 
 // Lấy tất cả đơn thuốc
 // Revert về bản gốc trong controller
+const layKhamBenhTheoIdBenhNhan = async (req, res) => {
+  try {
+    const { id} = req.params;
+    
+    const result = await prisma.$queryRaw`
+      EXEC sp_LayKhamBenh_TheoIdBenhNhan 
+        @idBenhNhan = ${id}
+    `;
+        const formattedData = result.map(item => ({
+      _id: item.idKhamBenh,
+      ChanDoan:item.ChanDoanPhanBiet || '',
+      KhamBHYT: item.KhamBHYT || 0,
+      MucHuong: item.MucHuong || 0,
+
+    }));
+    res.json({
+      success: true,
+      data: formattedData
+    });
+  } catch (error) {
+    console.error('Error in layKhamBenhTheoIdBenhNhan:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Lỗi khi lấy thông tin khám bệnh', 
+      error: error.message
+    });
+  }
+};
+
 const layTatCaDonThuoc = async (req, res) => {
   try {
     const result = await prisma.$queryRaw`
@@ -215,6 +247,7 @@ const themDonThuoc = async (req, res) => {
       doctorId, 
       diagnosis, 
       notes, 
+      idKhamBenh,
       medications = [] 
     } = req.body;
 
@@ -241,6 +274,7 @@ const themDonThuoc = async (req, res) => {
         @idBacSi = ${doctorId},
         @ChanDoan = ${diagnosis},
         @GhiChu = ${notes || null},
+        @idKhamBenh = ${idKhamBenh},
         @DanhSachThuoc = ${medicationsJson},
         @idDonThuocMoi = @idDonThuocMoi OUTPUT;
       SELECT @idDonThuocMoi as idDonThuocMoi;
@@ -266,8 +300,11 @@ const suaDonThuoc = async (req, res) => {
   try {
     const { id } = req.params;
     const { 
-      diagnosis, 
-      notes, 
+      idKhamBenh,
+      patientId, 
+      doctorId, 
+      diagnosis,
+      notes,
       medications = [] 
     } = req.body;
 
@@ -276,7 +313,8 @@ const suaDonThuoc = async (req, res) => {
       idDuocPham: med.code,
       SoLuong: med.quantity,
       LieuDung: med.dosage,
-      DuongDung: med.duongDung || 'Uống'
+      DuongDung: med.duongDung || 'Uống',
+
     }))) : null;
 
     await prisma.$executeRaw`
@@ -284,6 +322,9 @@ const suaDonThuoc = async (req, res) => {
         @idDonThuoc = ${id},
         @ChanDoan = ${diagnosis || null},
         @GhiChu = ${notes || null},
+        @idKhamBenh = ${idKhamBenh || null},
+        @idBenhNhan = ${patientId || null},
+        @idNguoiDung = ${doctorId || null},
         @DanhSachThuoc = ${medicationsJson}
     `;
 
@@ -547,5 +588,6 @@ module.exports = {
   layDanhSachBenhNhan,
   kiemTraTonKhoThuoc,
   thongKeDonThuoc,
-  topThuocDuocKe
+  topThuocDuocKe,
+  layKhamBenhTheoIdBenhNhan
 };
