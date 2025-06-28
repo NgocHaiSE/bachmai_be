@@ -171,6 +171,7 @@ const xoaPhieuYeuCauChuyenVien = async (req, res) => {
 const layChiTietYeuCauChuyenVien = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log('Request ID:', id);
     
     const result = await prisma.$queryRaw`
       EXEC sp_LayChiTietYeuCauChuyenVien @idYeuCauChuyenVien = ${id}
@@ -182,10 +183,10 @@ const layChiTietYeuCauChuyenVien = async (req, res) => {
         message: 'Không tìm thấy phiếu yêu cầu chuyển viện'
       });
     }
-    
+    console.log('Chi tiết yêu cầu chuyển viện:', result[0]);
     res.json({
       success: true,
-      data: result[0]
+      data: result
     });
   } catch (error) {
     console.error('Error in layChiTietYeuCauChuyenVien:', error);
@@ -209,7 +210,6 @@ const timKiemYeuCauChuyenVien = async (req, res) => {
         @tuNgay = ${tuNgay || null},
         @denNgay = ${denNgay || null}
     `;
-    
     res.json({
       success: true,
       data: result
@@ -281,6 +281,7 @@ const suaPhieuChuyenVien = async (req, res) => {
         @SDT_CoSoYTe = ${SDT_CoSoYTe},
         @YThuc = ${YThuc},
         @GhiChu = ${GhiChu}
+        @idBacSiPhuTrach = ${req.body.idNguoiDung || null}
     `;
 
     res.json({

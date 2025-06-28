@@ -65,6 +65,7 @@ try {
   const authRoutes = require('./routes/authRoutes');
   const khoaRoutes = require('./routes/khoaRoutes');
   const nhanVienRoutes = require('./routes/nhanVienRoutes');
+  const tiemChungRoutes = require('./routes/tiemChungRoutes');
 
   // Use routes
   app.use('/api/users', userRoutes);
@@ -79,6 +80,7 @@ try {
   app.use('/api/auth', authRoutes)
   app.use('/api/khoa', khoaRoutes)
   app.use('/api/nhan-vien', nhanVienRoutes)
+  app.use('/api/tiem-chung', tiemChungRoutes)
   
   
   console.log('✅ All routes loaded successfully');
