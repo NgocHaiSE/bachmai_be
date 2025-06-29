@@ -110,7 +110,7 @@ const suaPhieuYeuCauChuyenVien = async (req, res) => {
     console.error('Error in suaPhieuYeuCauChuyenVien:', error);
     res.status(500).json({
       success: false,
-      message: 'Lỗi khi cập nhật phiếu yêu cầu chuyển viện',
+      message:  error.meta.message,
       error: error.message
     });
   }
@@ -161,7 +161,7 @@ const xoaPhieuYeuCauChuyenVien = async (req, res) => {
     console.error('Error in xoaPhieuYeuCauChuyenVien:', error);
     res.status(500).json({
       success: false,
-      message: 'Lỗi khi xóa phiếu yêu cầu chuyển viện',
+      message: error.meta.message,
       error: error.message
     });
   }
@@ -258,7 +258,8 @@ const taoPhieuChuyenVien = async (req, res) => {
     console.error('Error in taoPhieuChuyenVien:', error);
     res.status(500).json({
       success: false,
-      message: 'Lỗi khi tạo phiếu chuyển viện',
+      // message: 'Lỗi khi tạo phiếu chuyển viện',
+      message: error.meta.message,
       error: error.message
     });
   }
@@ -280,7 +281,7 @@ const suaPhieuChuyenVien = async (req, res) => {
         @ThoiGianDuKien = ${ThoiGianDuKien},
         @SDT_CoSoYTe = ${SDT_CoSoYTe},
         @YThuc = ${YThuc},
-        @GhiChu = ${GhiChu}
+        @GhiChu = ${GhiChu},
         @idBacSiPhuTrach = ${req.body.idNguoiDung || null}
     `;
 
@@ -292,7 +293,7 @@ const suaPhieuChuyenVien = async (req, res) => {
     console.error('Error in suaPhieuChuyenVien:', error);
     res.status(500).json({
       success: false,
-      message: 'Lỗi khi cập nhật phiếu chuyển viện',
+      message: error.meta.message,
       error: error.message
     });
   }
@@ -319,7 +320,8 @@ const capNhatTrangThaiChuyenVien = async (req, res) => {
     console.error('Error in capNhatTrangThaiChuyenVien:', error);
     res.status(500).json({
       success: false,
-      message: 'Lỗi khi cập nhật trạng thái chuyển viện',
+      message: error.meta.message,
+      // message: 'Lỗi khi cập nhật trạng thái chuyển viện',
       error: error.message
     });
   }
@@ -342,7 +344,8 @@ const xoaPhieuChuyenVien = async (req, res) => {
     console.error('Error in xoaPhieuChuyenVien:', error);
     res.status(500).json({
       success: false,
-      message: 'Lỗi khi xóa phiếu chuyển viện',
+      // message: 'Lỗi khi xóa phiếu chuyển viện',
+      message: error.meta.message,
       error: error.message
     });
   }
@@ -382,23 +385,24 @@ const layChiTietPhieuChuyenVien = async (req, res) => {
 const timKiemPhieuChuyenVien = async (req, res) => {
   try {
     const { tuKhoa, trangThai, tuNgay, denNgay } = req.query;
-
-    const result = await prisma.$queryRaw`
+    console.log('🔍 Search params:', { tuKhoa, trangThai, tuNgay, denNgay });
+     const result = await prisma.$queryRaw`
       EXEC sp_TimKiemPhieuChuyenVien_V2
         @tuKhoa = ${tuKhoa || null},
         @trangThai = ${trangThai || null},
         @tuNgay = ${tuNgay || null},
         @denNgay = ${denNgay || null}
     `;
+    console.log('✅ Search result:', result);
     res.json({
       success: true,
       data: result
     });
   } catch (error) {
-    console.error('Error in timKiemPhieuChuyenVien:', error);
+    console.error('Error in timKiemYeuCauChuyenVien:', error);
     res.status(500).json({
       success: false,
-      message: 'Lỗi khi tìm kiếm phiếu chuyển viện',
+      message: 'Lỗi khi tìm kiếm phiếu yêu cầu chuyển viện',
       error: error.message
     });
   }
