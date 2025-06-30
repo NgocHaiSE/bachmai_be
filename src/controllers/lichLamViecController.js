@@ -10,12 +10,27 @@ const generateId = (prefix, length = 10) => {
 };
 
 // Format thời gian
+// Format thời gian
 const formatTime = (timeString) => {
   if (!timeString) return null;
-  if (typeof timeString === 'string' && timeString.includes(':')) {
-    return timeString;
+  
+  // Nếu đã là HH:MM format
+  if (typeof timeString === 'string' && timeString.includes(':') && !timeString.includes('T')) {
+    return timeString.slice(0, 5); // Lấy HH:MM
   }
-  return new Date(timeString).toTimeString().slice(0, 8);
+  
+  // Nếu là Date object hoặc ISO string
+  try {
+    const date = new Date(timeString);
+    if (isNaN(date.getTime())) return null;
+    
+    const hours = date.getUTCHours().toString().padStart(2, '0');
+    const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+    return `${hours}:${minutes}`;
+  } catch (error) {
+    console.error('Error formatting time:', error);
+    return null;
+  }
 };
 
 // Escape SQL string
@@ -334,8 +349,8 @@ const suaCaLamViec = async (req, res) => {
     if (idNhanVien || NgayLamViec || GioBD || GioKT) {
       const targetEmployee = idNhanVien || existingSchedule[0].idNhanVien;
       const targetDate = formattedDate || formatDateForSQL(existingSchedule[0].NgayLamViec);
-      const targetStartTime = GioBD || existingSchedule[0].GioBD;
-      const targetEndTime = GioKT || existingSchedule[0].GioKT;
+      const targetStartTime = GioBD || formatTime(existingSchedule[0].GioBD);
+      const targetEndTime = GioKT || formatTime(existingSchedule[0].GioKT);
 
       const conflictQuery = `
         SELECT COUNT(*) as conflictCount
@@ -771,18 +786,32 @@ const taoYeuCauChuyenCa = async (req, res) => {
     }
 
     // Kiểm tra xung đột lịch của nhân viên mới
+    // Format time cho conflict check
+    const shiftStartTime = formatTime(originalShift[0].GioBD);
+    const shiftEndTime = formatTime(originalShift[0].GioKT);
+    
+    console.log('Formatted times for conflict check:', {
+      shiftStartTime,
+      shiftEndTime,
+      originalGioBD: originalShift[0].GioBD,
+      originalGioKT: originalShift[0].GioKT
+    });
+
+    // Kiểm tra xung đột lịch của nhân viên mới
     const conflictQuery = `
       SELECT COUNT(*) as conflictCount
       FROM CALAMVIEC 
       WHERE idNhanVien = '${idNhanVienMoi}' 
       AND NgayLamViec = '${formattedOriginalDate}'
       AND (
-        (GioBD <= '${originalShift[0].GioBD}' AND GioKT > '${originalShift[0].GioBD}') OR
-        (GioBD < '${originalShift[0].GioKT}' AND GioKT >= '${originalShift[0].GioKT}') OR
-        (GioBD >= '${originalShift[0].GioBD}' AND GioKT <= '${originalShift[0].GioKT}')
+        (GioBD <= '${shiftStartTime}' AND GioKT > '${shiftStartTime}') OR
+        (GioBD < '${shiftEndTime}' AND GioKT >= '${shiftEndTime}') OR
+        (GioBD >= '${shiftStartTime}' AND GioKT <= '${shiftEndTime}')
       )
       AND TrangThai != N'Đã hủy'
     `;
+
+    console.log('Conflict check query:', conflictQuery);
 
     const conflictCheck = await prisma.$queryRawUnsafe(conflictQuery);
 
